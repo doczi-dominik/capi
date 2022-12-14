@@ -12,8 +12,9 @@ m.padding = 0
 m.selectedButton = 0
 
 local function barButton(text, index)
-    local bt = button.createButton(text, function()
-        PANEL.selectedPage = index
+    local bt = button.createButton(text, 
+        function()
+            PANEL.selectedPage = index
     end)
 
     function bt.draw(x, y, w, h, isSelected)
@@ -21,7 +22,7 @@ local function barButton(text, index)
 
         if isSelected then
             LG.setColor(COLOR.BUTTON_HIGHLIGHT)
-            w = w + w/2
+            w = w + m.padding
         else
             LG.setColor(COLOR.BUTTON_COLOR)
         end
@@ -53,6 +54,7 @@ function m.mousepressed(x, y, button)
     end
 
     m.selectedButton = math.floor(y / (WINDOW_H/#m.buttons))
+    m.buttons[m.selectedButton + 1].onclick()
 end
 
 function m.resize()

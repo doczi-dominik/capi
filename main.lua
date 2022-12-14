@@ -1,18 +1,24 @@
 require("editor.colors")
 LG = love.graphics
 
+
 DESIGN_W, DESIGN_H = 1280, 720
 WINDOW_W, WINDOW_H = 0, 0
 SCALE = 0
 
+FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
+LG.setFont(FONT)
+
+
 ACTIONBAR = require("editor.ACTIONBAR")
 PANEL = require("editor.PANEL")
+FILEMANAGER = require("editor.fileManager")
+
+FILEMANAGER.fileDialoge()
 
 ACTIONBAR.init()
 PANEL.init()
 
-FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
-LG.setFont(FONT)
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
