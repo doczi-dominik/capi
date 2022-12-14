@@ -10,7 +10,7 @@ m.selectedPage = 1
 
 function m.init()
     m.pages = {
-
+        require("editor.pages.spritesheets")
     }
 end
 
@@ -20,10 +20,6 @@ function m.resize()
 end
 
 function m.mousepressed(x, y, button)
-    do
-        return
-    end
-
     m.pages[m.selectedPage].mousepressed(x, y, button)
 end
 
@@ -33,12 +29,7 @@ function m.draw()
     LG.setColor(COLOR.BUTTON_HIGHLIGHT)
     LG.rectangle("fill", ACTIONBAR.width, ACTIONBAR.padding, ACTIONBAR.width + m.width - ACTIONBAR.padding, WINDOW_H - ACTIONBAR.padding * 2)
     LG.setColor(1, 1, 1)
-    
 
-    do
-        return
-    end
-    
     m.pages[m.selectedPage].draw()
 end
 
