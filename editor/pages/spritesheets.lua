@@ -8,7 +8,7 @@ local testImage
 
 function m.init()
     m.buttons = {
-        button.createStyledButton("Import png", FILEMANAGER.fileDialoge()),
+        button.createStyledButton("Import png", function() end),
         button.createStyledButton("<", function() m.selectionSize = m.selectionSize - 1 end),
         button.createStyledButton(">", function() m.selectionSize = m.selectionSize + 1 end),
     }
@@ -23,7 +23,7 @@ function m.mousepressed(x, y)
     end
 
     if y < 50 then
-        testImage = FILEMANAGER.readFileData()
+        testImage = LG.newImage(FILEMANAGER.readFileData())
     end
 end
 
@@ -41,7 +41,8 @@ function m.draw(x,y,w,h)
 
 
     if testImage ~= nil then
-        LG.draw(testImage, x + w, y)
+        LG.setColor(COLOR.WHITE)
+        LG.draw(testImage, x, y)
     end
 end
 

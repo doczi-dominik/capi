@@ -14,8 +14,6 @@ ACTIONBAR = require("editor.ACTIONBAR")
 PANEL = require("editor.PANEL")
 FILEMANAGER = require("editor.fileManager")
 
-FILEMANAGER.fileDialoge()
-
 ACTIONBAR.init()
 PANEL.init()
 
@@ -42,13 +40,42 @@ function love.draw()
     PANEL.draw()
     ACTIONBAR.draw()
 end
-
-
-
-
-
-
 --[[
+mainmenu = newVerticalContainer()
+
+mainmenu.padding = 8
+
+
+
+local m = {}
+
+function m.createContainer(widgets)
+    local c = {}
+
+    c.widgets = widgets
+
+    function c.draw()
+        for y = 1, #widgets do
+            local row = widgets[y]
+
+            for x = 1, #row do
+                local dx, dy
+
+                row[x].draw(dx, dy)
+            end
+        end
+    end
+end
+
+
+return m
+
+local root = m.createContainer({
+    { m.createContainer({}), m.createText("Asdaf"), m.createButton("fjdsfjskdl", function() end)  },
+    { m.createContainer()}
+})
+
+
 
 local m = {}
 

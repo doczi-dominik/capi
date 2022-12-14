@@ -5,16 +5,15 @@
 @echo off
 setlocal
 
-for /f "delims=" %%I in ('powershell "iex (${%~f0} | out-string)"') do (
-    echo %FileName%
+for /f "delims=" %%I in ('powershell "iex(${%~f0}|out-string)"') do (
+    echo  %%~I
 )
 goto :EOF
 
 : end Batch portion / begin PowerShell hybrid chimera #>
 
 Add-Type -AssemblyName System.Windows.Forms
-$f = new-object System.Windows.Forms.OpenFileDialog
+$f = new-object Windows.Forms.OpenFileDialog
 $f.InitialDirectory = pwd
-$f.filter = "All files (*.*)|*.*
-$f.ShowDialog()
-$f.FileName
+[void]$f.ShowDialog()
+$f.FileNamE
