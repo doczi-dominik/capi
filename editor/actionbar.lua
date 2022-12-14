@@ -1,4 +1,5 @@
-local buttons = require("editor.button")
+local button = require("editor.button")
+
 local m = {}
 
 m.DESIGN_WIDTH = 48
@@ -10,17 +11,39 @@ m.buttonHeight = 0
 m.padding = 0
 m.selectedButton = 0
 
-local function buttonCallback(i)
-    return function()
-        PANEL.selectedPage = i
+local function barButton(text, index)
+    local bt = button.createButton(text, function()
+        PANEL.selectedPage = index
+    end)
+
+    function bt.draw(x, y, w, h, isSelected)
+        local tw = w
+
+        if isSelected then
+            LG.setColor(COLOR.BUTTON_HIGHLIGHT)
+            w = w + w/2
+        else
+            LG.setColor(COLOR.BUTTON_COLOR)
+        end
+
+        LG.rectangle("fill",x,y,w,h)
+        LG.setColor(COLOR.BLACK)
+        LG.print(bt.text,
+            x + tw/2 - FONT:getHeight(bt.text)/1.7,
+            y + h/2 + FONT:getWidth(bt.text)/2,
+            -math.pi/2,
+            1,1)
+        LG.setColor(COLOR.WHITE)
     end
+
+    return bt
 end
 
 function m.init()
     m.buttons = {
-        buttons.createButton("draw",  buttonCallback(1)),
-        buttons.createButton("b", buttonCallback(2)),
-        buttons.createButton("c", buttonCallback(3)),
+        barButton("draw",  1),
+        barButton("b", 2),
+        barButton("export", 3)
     }
 end
 
@@ -36,7 +59,6 @@ function m.resize()
     m.padding = m.DESIGN_PADDING * SCALE
     m.width = m.DESIGN_WIDTH * SCALE
     m.buttonWidth = m.width - m.padding * 2
-    --m.buttonHeight = WINDOW_H / #m.buttons - (m.padding * 2)
     m.buttonHeight = (WINDOW_H - m.padding * (#m.buttons + 1)) / #m.buttons
 end
 

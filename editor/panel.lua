@@ -1,4 +1,3 @@
-
 local m = {}
 
 m.DESIGN_WIDTH = 256

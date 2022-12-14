@@ -11,7 +11,8 @@ PANEL = require("editor.PANEL")
 ACTIONBAR.init()
 PANEL.init()
 
-FONT = LG.getFont()
+FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
+LG.setFont(FONT)
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
