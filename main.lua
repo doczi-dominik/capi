@@ -10,8 +10,8 @@ FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
 LG.setFont(FONT)
 
 
-ACTIONBAR = require("editor.ACTIONBAR")
-PANEL = require("editor.PANEL")
+ACTIONBAR = require("editor.actionbar")
+PANEL = require("editor.panel")
 FILEMANAGER = require("editor.fileManager")
 
 ACTIONBAR.init()
