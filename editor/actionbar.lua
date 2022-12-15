@@ -12,11 +12,14 @@ m.padding = 0
 m.selectedButton = 0
 
 local function barButton(text, index)
-    local bt = button.createButton(text, 
+    local bt = button.createButton(
+        text,
         function()
             PANEL.selectedPage = index
-    end)
+        end
+    )
 
+    ---@diagnostic disable-next-line: duplicate-set-field
     function bt.draw(x, y, w, h, isSelected)
         local tw = w
 
@@ -30,7 +33,7 @@ local function barButton(text, index)
         LG.rectangle("fill",x,y,w,h)
         LG.setColor(COLOR.BLACK)
         LG.print(bt.text,
-            x + tw/2 - FONT:getHeight(bt.text)/1.7,
+            x + tw/2 - FONT:getHeight()/1.7,
             y + h/2 + FONT:getWidth(bt.text)/2,
             -math.pi/2,
             1,1)

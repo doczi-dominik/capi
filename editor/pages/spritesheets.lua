@@ -17,7 +17,7 @@ end
 function m.resize()
 end
 
-function m.mousepressed(x, y)
+function m.mousepressed(x, y, button)
     if x < ACTIONBAR.width or x > ACTIONBAR.width + PANEL.width then
         return
     end
@@ -37,7 +37,7 @@ function m.draw(x,y,w,h)
     m.buttons[3].draw(x + w - 50,y + 50 + PANEL.padding, 50, 50)
 
     LG.print("Grid size",x + w/2 - FONT:getWidth("Grid size")/2,y + 55)
-    LG.print(tostring(m.selectionSize * 8),x + w/2 - FONT:getWidth("00")/2,y + 55 + FONT:getHeight("00"))
+    LG.print(tostring(m.selectionSize * 8),x + w/2 - FONT:getWidth("00")/2,y + 55 + FONT:getHeight())
 
 
     if testImage ~= nil then
