@@ -2,25 +2,49 @@ local button = require("editor.button")
 
 local m = {}
 
-m.GRID_SIZE_STR = "Grid Size"
+m.GRID_SIZE_STR = "Selection Size"
 
 m.selectionSize = 1
+m.spriteSize = 2
 
-function m.init()
-    m.importBtn = button.createStyledButton("Import png")
-    m.reduceGridBtn = button.createStyledButton("<")
-    m.increaseGridBtn = button.createStyledButton(">")
+local function import()
 end
 
-function m.import()
-end
-
-function m.reduceGrid()
+local function reduceGrid()
     m.selectionSize = (m.selectionSize - 2) % 5 + 1
 end
 
-function m.increaseGrid()
+local function increaseGrid()
     m.selectionSize = (m.selectionSize) % 5 + 1
+end
+
+local function reduceSprite()
+    m.spriteSize = (m.spriteSize - 2) % 17 + 1
+end
+
+local function increaseSprite()
+    m.spriteSize = (m.spriteSize) % 17 + 1
+end
+
+local function getRow(y, i)
+    return y + (50 + PANEL.padding) * i
+end
+
+local function drawRange(x, y, w, label, value)
+    m.reduceBtn.draw(x, y, 50, 50)
+    m.increaseBtn.draw(x + w - 50, y, 50, 50)
+
+    LG.print(label,x + w/2 - FONT:getWidth(label)/2, y)
+
+    local str = tostring(value)
+
+    LG.print(str, x + w/2 - FONT:getWidth(str)/2, y + FONT_HEIGHT)
+end
+
+function m.init()
+    m.importBtn = button.createStyledButton("Import png")
+    m.reduceBtn = button.createStyledButton("<")
+    m.increaseBtn = button.createStyledButton(">")
 end
 
 function m.resize()
@@ -34,24 +58,36 @@ function m.mousepressed(x, y, button)
     end
 
     if y < 50 then
-        m.import()
+        import()
         return
     end
 
     if x < ACTIONBAR.width + 50 then
-        m.reduceGrid()
+        if y < 100 then
+            reduceSprite()
+        else
+            reduceGrid()
+        end
     elseif x > w - 50 then
-        m.increaseGrid()
+        if y < 100 then
+            increaseSprite()
+        else
+            increaseGrid()
+        end
     end
 end
 
 function m.draw(x,y,w,h)
     m.importBtn.draw(x,y,w,50)
-    m.reduceGridBtn.draw(x,y + 50 + PANEL.padding, 50, 50)
-    m.increaseGridBtn.draw(x + w - 50,y + 50 + PANEL.padding, 50, 50)
 
-    LG.print(m.GRID_SIZE_STR,x + w/2 - FONT:getWidth(m.GRID_SIZE_STR)/2,y + 55)
-    LG.print(tostring(m.selectionSize * 8),x + w/2 - FONT:getWidth("00")/2,y + 55 + FONT:getHeight())
+    drawRange(x, getRow(y, 1), w, "Sprite Size", m.spriteSize * 8)
+
+    local lineY = getRow(y, 2) + 25
+    LG.setColor(COLOR.PRIMARY)
+    LG.line(x, lineY, x + w, lineY)
+    LG.setColor(COLOR.WHITE)
+
+    drawRange(x, getRow(y, 3), w, "Sel. Size", m.selectionSize * 8)
 end
 
 return m

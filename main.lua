@@ -6,6 +6,7 @@ WINDOW_W, WINDOW_H = 0, 0
 SCALE = 0
 
 FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
+FONT_HEIGHT = FONT:getHeight()
 LG.setFont(FONT)
 
 ACTIONBAR = require("editor.actionbar")
