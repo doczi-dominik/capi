@@ -4,7 +4,7 @@ function b.createButton(text, onclick)
     local bt = {}
 
     bt.text = text
-    bt.onclick = onclick
+    bt.onclick = onclick or function() end
 
     function bt.draw(x, y)
         LG.print(bt.text, x, y)

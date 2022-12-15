@@ -1,49 +1,57 @@
-local m = {}
 local button = require("editor.button")
-local slider = require("editor.slider")
+
+local m = {}
+
+m.GRID_SIZE_STR = "Grid Size"
 
 m.selectionSize = 1
 
-local testImage
-
 function m.init()
-    m.buttons = {
-        button.createStyledButton("Import png", function() end),
-        button.createStyledButton("<", function() m.selectionSize = m.selectionSize - 1 end),
-        button.createStyledButton(">", function() m.selectionSize = m.selectionSize + 1 end),
-    }
+    m.importBtn = button.createStyledButton("Import png")
+    m.reduceGridBtn = button.createStyledButton("<")
+    m.increaseGridBtn = button.createStyledButton(">")
+end
+
+function m.import()
+end
+
+function m.reduceGrid()
+    m.selectionSize = (m.selectionSize - 2) % 5 + 1
+end
+
+function m.increaseGrid()
+    m.selectionSize = (m.selectionSize) % 5 + 1
 end
 
 function m.resize()
 end
 
 function m.mousepressed(x, y, button)
-    if x < ACTIONBAR.width or x > ACTIONBAR.width + PANEL.width then
+    local w = ACTIONBAR.width + PANEL.width
+
+    if x < ACTIONBAR.width or x > w then
         return
     end
 
     if y < 50 then
-        testImage = LG.newImage(FILEMANAGER.readFileData())
+        m.import()
+        return
+    end
+
+    if x < ACTIONBAR.width + 50 then
+        m.reduceGrid()
+    elseif x > w - 50 then
+        m.increaseGrid()
     end
 end
 
 function m.draw(x,y,w,h)
-    LG.print(PANEL.selectedPage,x,y)
+    m.importBtn.draw(x,y,w,50)
+    m.reduceGridBtn.draw(x,y + 50 + PANEL.padding, 50, 50)
+    m.increaseGridBtn.draw(x + w - 50,y + 50 + PANEL.padding, 50, 50)
 
-    --import button
-    m.buttons[1].draw(x,y,w,50)
-
-    m.buttons[2].draw(x,y + 50 + PANEL.padding, 50, 50)
-    m.buttons[3].draw(x + w - 50,y + 50 + PANEL.padding, 50, 50)
-
-    LG.print("Grid size",x + w/2 - FONT:getWidth("Grid size")/2,y + 55)
+    LG.print(m.GRID_SIZE_STR,x + w/2 - FONT:getWidth(m.GRID_SIZE_STR)/2,y + 55)
     LG.print(tostring(m.selectionSize * 8),x + w/2 - FONT:getWidth("00")/2,y + 55 + FONT:getHeight())
-
-
-    if testImage ~= nil then
-        LG.setColor(COLOR.WHITE)
-        LG.draw(testImage, x, y)
-    end
 end
 
 return m
