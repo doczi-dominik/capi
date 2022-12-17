@@ -10,9 +10,9 @@ m.selectedPage = 1
 
 function m.init()
     m.pages = {
-        require("editor.pages.spritesheets"),
-        require("editor.pages.spritesheets"),
-        require("editor.pages.spritesheets")
+        require("ui.pages.spritesheets"),
+        require("ui.pages.spritesheets"),
+        require("ui.pages.spritesheets")
     }
 
     for i=1,#m.pages,1 do

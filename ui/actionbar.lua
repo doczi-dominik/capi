@@ -1,4 +1,4 @@
-local button = require("editor.button")
+local button = require("ui.button")
 
 local m = {}
 
