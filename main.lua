@@ -12,9 +12,11 @@ require("ui.colors")
 
 ACTIONBAR = require("ui.actionbar")
 PANEL = require("ui.panel")
+SHEET = require("sheet.sheet")
 
 ACTIONBAR.init()
 PANEL.init()
+SHEET.init(512, 512)
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
@@ -32,9 +34,12 @@ function love.mousepressed(x, y, button)
 end
 
 function love.update(dt)
+    SHEET.update(dt)
 end
 
 function love.draw()
     PANEL.draw()
     ACTIONBAR.draw()
+
+    SHEET.draw()
 end
