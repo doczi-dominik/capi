@@ -1,4 +1,3 @@
-require("ui.colors")
 LG = love.graphics
 
 DESIGN_W, DESIGN_H = 1280, 720
@@ -9,9 +8,10 @@ FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
 FONT_HEIGHT = FONT:getHeight()
 LG.setFont(FONT)
 
+require("ui.colors")
+
 ACTIONBAR = require("ui.actionbar")
 PANEL = require("ui.panel")
-FILEMANAGER = require("ui.fileManager")
 
 ACTIONBAR.init()
 PANEL.init()
