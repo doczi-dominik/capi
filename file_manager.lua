@@ -1,7 +1,7 @@
 
 local m = {}
 
----@return love.FileData|nil
+---@return love.FileData?
 function m.fileDialogue()
     if love.system.getOS() ~= "Windows" then
         return
