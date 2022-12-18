@@ -132,6 +132,10 @@ function lib.newText(options, style)
         end
     end
 
+    function c.outVar.setText(text)
+        c.text = text
+    end
+
     return c
 end
 
@@ -255,6 +259,10 @@ function lib.newButton(options, style)
     end
 
     function c:draw()
+        if c.drawExt ~= nil then
+            c:drawExt()
+        end
+
         if c.border_color ~= nil then
             LG.setColor(c.border_color)
             LG.rectangle("fill",c.x,c.y,c.w,c.h)
@@ -273,7 +281,7 @@ function lib.newButton(options, style)
         LG.setColor(c.color)
         
         if c.alignmet == "center" then
-            LG.print(c.text,c.x + c.w/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2,0,c.text_scale,c.text_scale)    
+            LG.print(c.text,c.x + c.tw/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2,0,c.text_scale,c.text_scale)    
         elseif c.alignmet == "+90" then
             LG.print(c.text,
             c.x + c.tw/2 - FONT:getHeight()/1.7,
@@ -282,9 +290,7 @@ function lib.newButton(options, style)
             1,1)
         end
 
-        if c.drawExt ~= nil then
-            c:drawExt()
-        end
+        
     end
 
     return c
