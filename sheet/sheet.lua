@@ -30,6 +30,8 @@ local function updateDrag()
     end
 end
 
+local x,y = SHEETINFO.x,SHEETINFO.y
+
 m.zoom = 1
 
 function m.init(width, height)
@@ -77,6 +79,13 @@ function m.wheelmoved(x, y)
     end
 end
 
+function SHEETINFO.mousepressed(x,y,button)
+end
+
+function m.update(dt)
+    cursorX, cursorY = love.mouse.getPosition()
+end
+
 function m.draw()
     local sheetAreaX = ACTIONBAR.width + PANEL.width
 
@@ -89,6 +98,7 @@ function m.draw()
     local cx = math.floor((cursorX - x) / (64 * scale))
     local cy = math.floor((cursorY - y) / (64 * scale))
 
+    LG.setColor(COLOR.WHITE)
     LG.setCanvas(canvas)
     LG.clear()
 

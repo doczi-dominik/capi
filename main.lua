@@ -1,3 +1,5 @@
+---@diagnostic disable: duplicate-set-field
+
 LG = love.graphics
 
 DESIGN_W, DESIGN_H = 1280, 720
@@ -8,50 +10,67 @@ FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
 FONT_HEIGHT = FONT:getHeight()
 LG.setFont(FONT)
 
+
+SHEETINFO = {}
+PANELINFO = {}
+
+-- LIBRARY SETUP
+DUI = require("libs.duckUI")
+DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 require("ui.colors")
+require("ui.style")
 
-ACTIONBAR = require("ui.actionbar")
-PANEL = require("ui.panel")
-SHEET = require("sheet.sheet")
+ROOT = require("ui.interface")
+ROOT.computeLayout()
 
-ACTIONBAR.init()
-PANEL.init()
-SHEET.init(512, 512)
+
+
+--SHEET = require("sheet.sheet")
+--SHEET.init(512, 512)
+
+PAGES = {
+    require("ui.pageview.spritesheetView"),
+    require("ui.pageview.nemtom"),
+    require("ui.pageview.exportView")
+}
+PANELINFO.setChild(PAGES[1])
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
     SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
 
-    ACTIONBAR.resize()
-    PANEL.resize()
+    DUI.resize(w,h)
+    ROOT.computeLayout()
 end
 
-love.resize(LG.getDimensions())
-
 function love.mousepressed(x, y, button)
-    ACTIONBAR.mousepressed(x, y, button)
-    PANEL.mousepressed(x, y, button)
-    SHEET.mousepressed(x, y, button)
+    --SHEET.mousepressed(x, y, button)
+    ROOT.mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button)
-    SHEET.mousereleased(x, y, button)
+    --SHEET.mousereleased(x, y, button)
 end
 
 function love.mousemoved(x, y)
-    SHEET.mousemoved(x, y)
+   --SHEET.mousemoved(x, y)
 end
 
 function love.wheelmoved(x, y)
-    SHEET.wheelmoved(x, y)
+    --SHEET.wheelmoved(x, y)
+end
+
+function love.mouse.isDown()
+    ROOT.mouseIsDown()
 end
 
 function love.update(dt)
 end
 
 function love.draw()
-    PANEL.draw()
-    ACTIONBAR.draw()
+    --SHEET.draw()
 
-    SHEET.draw()
+    ROOT.draw()
 end
+
+love.resize(LG.getDimensions())
