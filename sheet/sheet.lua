@@ -15,7 +15,6 @@ local function updateDrag()
         return
     end
 
-
     local dx = dragStartX - cursorX
     local dy = dragStartY - cursorY
     local dist = (dx ^ 2 + dy ^ 2) ^ 0.5

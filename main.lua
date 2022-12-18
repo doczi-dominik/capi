@@ -10,20 +10,17 @@ FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
 FONT_HEIGHT = FONT:getHeight()
 LG.setFont(FONT)
 
-
-SHEETINFO = {}
-PANELINFO = {}
-
 -- LIBRARY SETUP
 DUI = require("libs.duckUI")
 DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 require("ui.colors")
 require("ui.style")
 
-ROOT = require("ui.interface")
+local sheetInfo = {}
+local panelInfo =  {}
+
+ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
-
-
 
 --SHEET = require("sheet.sheet")
 --SHEET.init(512, 512)
@@ -33,7 +30,8 @@ PAGES = {
     require("ui.pageview.nemtom"),
     require("ui.pageview.exportView")
 }
-PANELINFO.setChild(PAGES[1])
+
+panelInfo.setChild(PAGES[1])
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
