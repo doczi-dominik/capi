@@ -33,6 +33,7 @@ local function updateDrag()
 end
 
 m.zoom = 1
+m.showGrid = true
 
 ---comment
 ---@param sheetInfo table info table used by `duckUI` to maintain layout information
@@ -78,24 +79,32 @@ function m.init(sheetInfo, width, height)
     function info.draw()
         local padding = 24 * SCALE
         local scale = m.zoom * SCALE
-    
+
         local x = info.x + padding + offsetX
         local y = padding + offsetY
-    
+
         local cx = math.floor((cursorX - x) / (CELL_SIZE * scale))
         local cy = math.floor((cursorY - y) / (CELL_SIZE * scale))
-    
+
         LG.setColor(COLOR.WHITE)
         LG.setCanvas(canvas)
         LG.clear()
-    
-        for y = 0, h, CELL_SIZE do
-            LG.line(0, y, w, y)
+
+        LG.setColor(0.7, 0.7, 0.7, 0.5)
+
+        if m.showGrid then
+            for y = 0, h, CELL_SIZE do
+                LG.line(0, y, w, y)
+            end
+
+            for x = 0, w, CELL_SIZE do
+                LG.line(x, 0, x, h)
+            end
         end
 
-        for x = 0, w, CELL_SIZE do
-            LG.line(x, 0, x, h)
-        end
+        LG.rectangle("line", 0, 0, w, h)
+
+        LG.setColor(1, 1, 1)
 
         LG.rectangle("fill", cx * CELL_SIZE, cy * CELL_SIZE, CELL_SIZE, CELL_SIZE)
 
