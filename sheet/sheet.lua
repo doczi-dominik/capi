@@ -1,5 +1,7 @@
 local m = {}
 
+local CELL_SIZE = 64
+
 local info
 local canvas  ---@type love.Canvas
 local w, h  ---@type number, number
@@ -32,11 +34,15 @@ end
 
 m.zoom = 1
 
+---comment
+---@param sheetInfo table info table used by `duckUI` to maintain layout information
+---@param width integer the width of the sheet **in cells**
+---@param height integer the height of the sheet **in cells**
 function m.init(sheetInfo, width, height)
     info = sheetInfo
-    w = width
-    h = height
-    canvas = LG.newCanvas(width, height)
+    w = width * CELL_SIZE
+    h = height * CELL_SIZE
+    canvas = LG.newCanvas(w, h)
 
     function info.mousepressed(x, y, button)
         dragStartX, dragStartY = x, y
@@ -76,23 +82,23 @@ function m.init(sheetInfo, width, height)
         local x = info.x + padding + offsetX
         local y = padding + offsetY
     
-        local cx = math.floor((cursorX - x) / (64 * scale))
-        local cy = math.floor((cursorY - y) / (64 * scale))
+        local cx = math.floor((cursorX - x) / (CELL_SIZE * scale))
+        local cy = math.floor((cursorY - y) / (CELL_SIZE * scale))
     
         LG.setColor(COLOR.WHITE)
         LG.setCanvas(canvas)
         LG.clear()
     
-        for y = 0, h, 64 do
+        for y = 0, h, CELL_SIZE do
             LG.line(0, y, w, y)
         end
-    
-        for x = 0, w, 64 do
+
+        for x = 0, w, CELL_SIZE do
             LG.line(x, 0, x, h)
         end
-    
-        LG.rectangle("fill", cx * 64, cy * 64, 64, 64)
-    
+
+        LG.rectangle("fill", cx * CELL_SIZE, cy * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
         LG.setCanvas()
         LG.setScissor(info.x, 0, WINDOW_W - info.y, WINDOW_H)
         LG.draw(canvas, x, y, 0, scale, scale)

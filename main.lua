@@ -24,7 +24,7 @@ ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
 
 SHEET = require("sheet.sheet")
-SHEET.init(sheetInfo, 512, 512)
+SHEET.init(sheetInfo, 8, 8)
 
 PAGES = {
     require("ui.pageview.spritesheetView"),
