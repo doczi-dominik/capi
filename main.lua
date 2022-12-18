@@ -33,6 +33,10 @@ function love.mousepressed(x, y, button)
     PANEL.mousepressed(x, y, button)
 end
 
+function love.wheelmoved(x, y)
+    SHEET.wheelmoved(x, y)
+end
+
 function love.update(dt)
     SHEET.update(dt)
 end

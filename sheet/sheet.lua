@@ -21,6 +21,16 @@ function m.update(dt)
     cursorX, cursorY = love.mouse.getPosition()
 end
 
+function m.wheelmoved(x, y)
+    if y > 0 then
+        m.zoom = m.zoom + 0.05
+    end
+
+    if y < 0 then
+        m.zoom = m.zoom - 0.05
+    end
+end
+
 function m.draw()
     local offset = 24 * SCALE
     local scale = m.zoom * SCALE
