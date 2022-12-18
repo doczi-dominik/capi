@@ -22,8 +22,8 @@ local panelInfo =  {}
 ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
 
---SHEET = require("sheet.sheet")
---SHEET.init(512, 512)
+SHEET = require("sheet.sheet")
+SHEET.init(sheetInfo, 512, 512)
 
 PAGES = {
     require("ui.pageview.spritesheetView"),
@@ -58,15 +58,11 @@ function love.wheelmoved(x, y)
     --SHEET.wheelmoved(x, y)
 end
 
-function love.mouse.isDown()
-    ROOT.mouseIsDown()
-end
-
 function love.update(dt)
 end
 
 function love.draw()
-    --SHEET.draw()
+    SHEET.draw()
 
     ROOT.draw()
 end

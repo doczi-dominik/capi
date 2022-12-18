@@ -1,5 +1,6 @@
 local m = {}
 
+local info
 local canvas  ---@type love.Canvas
 local w, h  ---@type number, number
 local cursorX, cursorY = love.mouse.getPosition()
@@ -29,69 +30,51 @@ local function updateDrag()
     end
 end
 
-local x,y = SHEETINFO.x,SHEETINFO.y
-
 m.zoom = 1
 
-function m.init(width, height)
+function m.init(sheetInfo, width, height)
+    info = sheetInfo
     w = width
     h = height
     canvas = LG.newCanvas(width, height)
-end
 
-function m.mousepressed(x, y, button)
-    if button ~= 1 or x < ACTIONBAR.width + PANEL.width then
-        return
+    function info.mousepressed(x, y, button)
+        dragStartX, dragStartY = x, y
+        dragStartOffsetX = offsetX
+        dragStartOffsetY = offsetY
     end
 
-    dragStartX, dragStartY = x, y
-    dragStartOffsetX = offsetX
-    dragStartOffsetY = offsetY
-end
+    function info.mousereleased(x, y, button)
+        if button ~= 1 then
+            return
+        end
 
-function m.mousereleased(x, y, button)
-    if button ~= 1 then
-        return
+        dragStartX, dragStartY = nil, nil
+        dragEnabled = false
     end
 
-    dragStartX, dragStartY = nil, nil
-    dragEnabled = false
-end
+    function info.mousemoved(x, y)
+        cursorX, cursorY = x, y
 
-function m.mousemoved(x, y)
-    if x < ACTIONBAR.width + PANEL.width then
-        return
+        updateDrag()
     end
 
-    cursorX, cursorY = x, y
+    function info.wheelmoved(x, y)
+        if y > 0 then
+            m.zoom = m.zoom + 0.1
+        end
 
-    updateDrag()
-end
-
-function m.wheelmoved(x, y)
-    if y > 0 then
-        m.zoom = m.zoom + 0.1
+        if y < 0 then
+            m.zoom = m.zoom - 0.1
+        end
     end
-
-    if y < 0 then
-        m.zoom = m.zoom - 0.1
-    end
-end
-
-function SHEETINFO.mousepressed(x,y,button)
-end
-
-function m.update(dt)
-    cursorX, cursorY = love.mouse.getPosition()
 end
 
 function m.draw()
-    local sheetAreaX = ACTIONBAR.width + PANEL.width
-
     local padding = 24 * SCALE
     local scale = m.zoom * SCALE
 
-    local x = sheetAreaX + padding + offsetX
+    local x = info.x + padding + offsetX
     local y = padding + offsetY
 
     local cx = math.floor((cursorX - x) / (64 * scale))
@@ -112,7 +95,7 @@ function m.draw()
     LG.rectangle("fill", cx * 64, cy * 64, 64, 64)
 
     LG.setCanvas()
-    LG.setScissor(sheetAreaX, 0, WINDOW_W - sheetAreaX, WINDOW_H)
+    LG.setScissor(info.x, 0, WINDOW_W - info.y, WINDOW_H)
     LG.draw(canvas, x, y, 0, scale, scale)
     LG.setScissor()
 end
