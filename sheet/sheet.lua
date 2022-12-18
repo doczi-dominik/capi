@@ -1,13 +1,34 @@
 local m = {}
 
----@type love.Canvas
-local canvas
+local canvas  ---@type love.Canvas
+local w, h  ---@type number, number
+local cursorX, cursorY  ---@type number, number
+local offsetX, offsetY = 0, 0
 
----@type number, number
-local w, h
+local dragStartX, dragStartY  ---@type number|nil, number|nil
+local dragStartOffsetX ---@type number
+local dragStartOffsetY  ---@type number
+local dragEnabled = false
 
----@type number, number
-local cursorX, cursorY
+local function updateDrag()
+    if dragStartX == nil or dragStartY == nil then
+        return
+    end
+
+
+    local dx = dragStartX - cursorX
+    local dy = dragStartY - cursorY
+    local dist = (dx ^ 2 + dy ^ 2) ^ 0.5
+
+    if dist > 15 then
+        dragEnabled = true
+    end
+
+    if dragEnabled then
+        offsetX = dragStartOffsetX + cursorX - dragStartX
+        offsetY = dragStartOffsetY + cursorY - dragStartY
+    end
+end
 
 m.zoom = 1
 
@@ -19,6 +40,27 @@ end
 
 function m.update(dt)
     cursorX, cursorY = love.mouse.getPosition()
+
+    updateDrag()
+end
+
+function m.mousepressed(x, y, button)
+    if button ~= 1 or x < ACTIONBAR.width + PANEL.width then
+        return
+    end
+
+    dragStartX, dragStartY = x, y
+    dragStartOffsetX = offsetX
+    dragStartOffsetY = offsetY
+end
+
+function m.mousereleased(x, y, button)
+    if button ~= 1 then
+        return
+    end
+
+    dragStartX, dragStartY = nil, nil
+    dragEnabled = false
 end
 
 function m.wheelmoved(x, y)
@@ -32,11 +74,13 @@ function m.wheelmoved(x, y)
 end
 
 function m.draw()
-    local offset = 24 * SCALE
+    local sheetAreaX = ACTIONBAR.width + PANEL.width
+
+    local padding = 24 * SCALE
     local scale = m.zoom * SCALE
 
-    local x = ACTIONBAR.width + PANEL.width + offset
-    local y = offset
+    local x = sheetAreaX + padding + offsetX
+    local y = padding + offsetY
 
     local cx = math.floor((cursorX - x) / (64 * scale))
     local cy = math.floor((cursorY - y) / (64 * scale))
@@ -55,7 +99,9 @@ function m.draw()
     LG.rectangle("fill", cx * 64, cy * 64, 64, 64)
 
     LG.setCanvas()
+    LG.setScissor(sheetAreaX, 0, WINDOW_W - sheetAreaX, WINDOW_H)
     LG.draw(canvas, x, y, 0, scale, scale)
+    LG.setScissor()
 end
 
 return m

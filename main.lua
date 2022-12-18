@@ -31,6 +31,11 @@ love.resize(LG.getDimensions())
 function love.mousepressed(x, y, button)
     ACTIONBAR.mousepressed(x, y, button)
     PANEL.mousepressed(x, y, button)
+    SHEET.mousepressed(x, y, button)
+end
+
+function love.mousereleased(x, y, button)
+    SHEET.mousereleased(x, y, button)
 end
 
 function love.wheelmoved(x, y)
