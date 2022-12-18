@@ -41,22 +41,20 @@ function lib.baseClass(options, style)
         end
     end
 
-    function c.computeLayout()
+    function c.computeLayout(x,y,w,h)
+        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
     end
 
-    function c.mousepressed( x, y, button)
+    function c.mouseInput( x, y, button, type)
+        for i = 1, #c.children do
+            c.children[i].mouseInput(x,y,button, type)
+        end
     end
 
     function c.outVar.setChild(children)
         c.children = children
         for i = 1,#c.children do
             c.children[i].parent = c
-        end
-    end
-
-    function c.mouseIsDown()
-        for i = 1, #c.children do
-            c.children[i].mouseIsDown()
         end
     end
 
@@ -76,31 +74,66 @@ function lib.newVerticalContainer(options, style)
         c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
         local cy = c.y
         for i=1,#c.children do
-            local ch = c.h * c.children[i].sizeFactor
-            print(c.debug_name .. " drawing chidren at:",c.x + c.padding, cy + c.padding ,c.w - c.padding * 2,math.min(ch, c.h-cy) - c.padding * 2)
+            local ch = c.h * c.children[i].sizeFactor           
             c.children[i].computeLayout(c.x + c.padding, cy + c.padding ,c.w - c.padding * 2,math.min(ch, c.h-cy + c.y) - c.padding * 2)
 
             cy = cy + ch
         end
     end
 
-    function c.mousepressed( x, y, button)
+    function c.mouseInput( x, y, button, type)
+        local cx,cy = x,y
+        if type == "wheelmoved" then
+            cx,cy = love.mouse.getPosition()
+        end
         local lastcy = 0
-        local cy = c.y
+        local ccy = c.y
         for i = 1, #c.children do
             
-            cy = cy + (c.children[i].sizeFactor * c.h) + c.padding
-            if y < cy and y > lastcy then
-                c.children[i].mousepressed( x, y, button)
+            ccy = ccy + (c.children[i].sizeFactor * c.h) + c.padding
+            if cy < ccy and cy > lastcy then
+                c.children[i].mouseInput( x, y, button, type)
                 break
             end
-            lastcy = cy
+            lastcy = ccy
         end
     end
 
     return c
 end
 
+----------------- TEXT -------------------
+
+function lib.newText(options, style)
+    options = options or {}
+    style = style or {}
+    local c = lib.baseClass(options, style)
+    c.text = options.text or ""
+    c.alignmet = style.alignmet or options.alignmet or "center"
+    c.color = style.color or options.color or {0,0,0}
+    c.tw = 0
+
+    function c.computeLayout(x,y,w,h)
+        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.tw = w
+    end
+
+    function c:draw()
+        LG.setColor(c.color)
+        
+        if c.alignmet == "center" then
+            LG.print(c.text,c.x + c.w/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2)    
+        elseif c.alignmet == "+90" then
+            LG.print(c.text,
+            c.x + c.tw/2 - FONT:getHeight()/1.7,
+            c.y + c.h/2 + FONT:getWidth(c.text)/2,
+            -math.pi/2,
+            1,1)
+        end
+    end
+
+    return c
+end
 
 
 ------------ HORIZONTAL CONTAINER -------------
@@ -118,21 +151,25 @@ function lib.newHorizontalContainer(options, style)
                 y + c.padding,
                 math.min(cw,c.w - cx + c.x),
                 c.h - c.padding * 2)
-            print(c.debug_name,cw,w-cx,w,cx)
             cx = cx + cw
         end
     end
 
-    function c.mousepressed( x, y, button)
-        local cx = c.x
+    function c.mouseInput( x, y, button,type)
+        local cx,cy = x,y
+        if type == "wheelmoved" then
+            cx,cy = love.mouse.getPosition()
+        end
+        local ccx = c.x
         for i = 1, #c.children do
-            cx = cx + (c.children[i].sizeFactor * c.w) + c.padding
-            if x < cx then
-                c.children[i].mousepressed( x, y, button)
+            ccx = ccx + (c.children[i].sizeFactor * c.w) + c.padding
+            if cx < ccx then
+                c.children[i].mouseInput( x, y, button,type)
                 break
             end
         end
     end
+
 
     return c
 end
@@ -146,9 +183,18 @@ function lib.newContainer(options, style)
         c.outVar.x,c.outVar.y,c.outVar.w,c.outVar.h   = x,y,w,h
     end
 
-    function c.mousepressed(x,y,button)
-        c.outVar.mousepressed(x,y,button)
+    function c.mouseInput(x, y, button, type)
+        if type == "mousepressed" and c.outVar.mousepressed ~= nil then
+            c.outVar.mousepressed(x,y,button)
+        elseif type == "mousereleased"  and c.outVar.mousereleased ~= nil then
+            c.outVar.mousereleased(x,y,button)
+        elseif type == "mousemoved" and c.outVar.mousemoved ~= nil then
+            c.outVar.mousemoved(x,y)
+        elseif type == "wheelmoved" and c.outVar.wheelmoved ~= nil then
+            c.outVar.wheelmoved(x,y)
+        end
     end
+
     return c
 end
 
@@ -181,11 +227,12 @@ function lib.newButton(options, style)
     function c.computeLayout(x,y,w,h)
         c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
         c.tw = w
-        print(c.text.. "with ", x,y,w,h)
     end
 
-    function c.mouseIsDown()
-        
+    function c.mouseInput(x, y, button, type)
+        if type == "mousepressed" then
+            c.mousepressed(x,y,button)
+        end
     end
 
     function c.mousepressed( x, y, button)
@@ -228,7 +275,7 @@ function lib.newButton(options, style)
             c.x + c.tw/2 - FONT:getHeight()/1.7,
             c.y + c.h/2 + FONT:getWidth(c.text)/2,
             -math.pi/2,
-            c.text_scale,c.text_scale)
+            1,1)
         end
 
         if c.drawExt ~= nil then
@@ -272,14 +319,9 @@ function lib.newMainContainer(options, style)
         c.child.computeLayout(0,0,lib.window_w,lib.window_h)
     end
 
-    function c.mousepressed(x, y, button)
-        c.child.mousepressed(x, y, button)
+    function c.mouseInput(x, y, button, type)
+        c.child.mouseInput(x, y, button, type)
     end
-
-    function c.mouseIsDown()
-        c.child.mouseIsDown()
-    end
- 
 
     return c
 end

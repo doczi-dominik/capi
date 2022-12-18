@@ -42,20 +42,19 @@ function love.resize(w, h)
 end
 
 function love.mousepressed(x, y, button)
-    --SHEET.mousepressed(x, y, button)
-    ROOT.mousepressed(x, y, button)
+    ROOT.mouseInput(x, y, button, "mousepressed")
 end
 
 function love.mousereleased(x, y, button)
-    --SHEET.mousereleased(x, y, button)
+    ROOT.mouseInput(x, y, button, "mousereleased")
 end
 
 function love.mousemoved(x, y)
-   --SHEET.mousemoved(x, y)
+    ROOT.mouseInput(x, y, nil, "mousemoved")
 end
 
 function love.wheelmoved(x, y)
-    --SHEET.wheelmoved(x, y)
+    ROOT.mouseInput(x, y, nil, "wheelmoved")
 end
 
 function love.update(dt)
