@@ -1,6 +1,7 @@
 ---@diagnostic disable: duplicate-set-field
 
 LG = love.graphics
+LG.setDefaultFilter("nearest","nearest")
 
 DESIGN_W, DESIGN_H = 1280, 720
 WINDOW_W, WINDOW_H = 0, 0
@@ -41,6 +42,7 @@ function love.resize(w, h)
     ROOT.computeLayout()
 end
 
+
 function love.mousepressed(x, y, button)
     ROOT.mouseInput(x, y, button, "mousepressed")
 end
@@ -61,8 +63,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    SHEET.draw()
-
     ROOT.draw()
 end
 

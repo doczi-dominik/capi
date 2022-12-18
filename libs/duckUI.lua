@@ -183,6 +183,10 @@ function lib.newContainer(options, style)
         c.outVar.x,c.outVar.y,c.outVar.w,c.outVar.h   = x,y,w,h
     end
 
+    function c:draw()
+        c.outVar.draw()
+    end
+
     function c.mouseInput(x, y, button, type)
         if type == "mousepressed" and c.outVar.mousepressed ~= nil then
             c.outVar.mousepressed(x,y,button)
