@@ -69,11 +69,11 @@ end
 
 function m.wheelmoved(x, y)
     if y > 0 then
-        m.zoom = m.zoom + 0.05
+        m.zoom = m.zoom + 0.1
     end
 
     if y < 0 then
-        m.zoom = m.zoom - 0.05
+        m.zoom = m.zoom - 0.1
     end
 end
 
