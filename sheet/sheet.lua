@@ -104,7 +104,7 @@ function m.init(sheetInfo, width, height)
 
         LG.rectangle("line", 0, 0, w, h)
 
-        LG.setColor(1, 1, 1)
+        LG.setColor(1, 1, 1, 1)
 
         LG.rectangle("fill", cx * CELL_SIZE, cy * CELL_SIZE, CELL_SIZE, CELL_SIZE)
 
