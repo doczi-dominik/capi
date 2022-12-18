@@ -2,7 +2,7 @@ local m = {}
 
 local canvas  ---@type love.Canvas
 local w, h  ---@type number, number
-local cursorX, cursorY  ---@type number, number
+local cursorX, cursorY = love.mouse.getPosition()
 local offsetX, offsetY = 0, 0
 
 local dragStartX, dragStartY  ---@type number|nil, number|nil
@@ -38,12 +38,6 @@ function m.init(width, height)
     canvas = LG.newCanvas(width, height)
 end
 
-function m.update(dt)
-    cursorX, cursorY = love.mouse.getPosition()
-
-    updateDrag()
-end
-
 function m.mousepressed(x, y, button)
     if button ~= 1 or x < ACTIONBAR.width + PANEL.width then
         return
@@ -61,6 +55,16 @@ function m.mousereleased(x, y, button)
 
     dragStartX, dragStartY = nil, nil
     dragEnabled = false
+end
+
+function m.mousemoved(x, y)
+    if x < ACTIONBAR.width + PANEL.width then
+        return
+    end
+
+    cursorX, cursorY = x, y
+
+    updateDrag()
 end
 
 function m.wheelmoved(x, y)

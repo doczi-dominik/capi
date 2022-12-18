@@ -38,12 +38,15 @@ function love.mousereleased(x, y, button)
     SHEET.mousereleased(x, y, button)
 end
 
+function love.mousemoved(x, y)
+    SHEET.mousemoved(x, y)
+end
+
 function love.wheelmoved(x, y)
     SHEET.wheelmoved(x, y)
 end
 
 function love.update(dt)
-    SHEET.update(dt)
 end
 
 function love.draw()
