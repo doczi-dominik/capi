@@ -23,8 +23,15 @@ local panelInfo =  {}
 ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
 
+local spriteCollection = require("data.sprite_collection")(16)
+
 SHEET = require("sheet.sheet")
-SHEET.init(sheetInfo, 8, 8)
+SHEET.init({
+    info = sheetInfo,
+    width = 8,
+    height = 8,
+    sprites = spriteCollection
+})
 
 PAGES = {
     require("ui.pageview.spritesheetView"),
@@ -41,7 +48,6 @@ function love.resize(w, h)
     DUI.resize(w,h)
     ROOT.computeLayout()
 end
-
 
 function love.mousepressed(x, y, button)
     ROOT.mouseInput(x, y, button, "mousepressed")

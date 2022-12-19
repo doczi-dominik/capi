@@ -1,10 +1,11 @@
 local m = {}
 
-local CELL_SIZE = 64
-
-local info
+local data  ---@type integer[][]
+local info  ---@type table
+local sprites  ---@type spriteCollection
 local canvas  ---@type love.Canvas
-local w, h  ---@type number, number
+local cellW, cellH  ---@type integer, integer
+local w, h  ---@type integer, integer
 local cursorX, cursorY = love.mouse.getPosition()
 local offsetX, offsetY = 0, 0
 
@@ -35,14 +36,31 @@ end
 m.zoom = 1
 m.showGrid = true
 
----comment
----@param sheetInfo table info table used by `duckUI` to maintain layout information
----@param width integer the width of the sheet **in cells**
----@param height integer the height of the sheet **in cells**
-function m.init(sheetInfo, width, height)
-    info = sheetInfo
-    w = width * CELL_SIZE
-    h = height * CELL_SIZE
+---@class sheetInitOptions
+---@field info table info table used by `duckUI` to maintain layout information
+---@field width integer the width of the sheet **in cells**
+---@field height integer the height of the sheet **in cells**
+---@field sprites spriteCollection reference to the main spriteCollection
+
+---@param opts sheetInitOptions
+function m.init(opts)
+    info = opts.info
+    sprites = opts.sprites
+    cellW, cellH = opts.width, opts.height
+
+    data = {}
+
+    for y = 1, cellH do
+        data[y] = {}
+
+        for x = 1, cellW do
+            data[y][x] = 0
+        end
+    end
+
+    w = cellW * sprites.spriteSize
+    h = cellH * sprites.spriteSize
+
     canvas = LG.newCanvas(w, h)
 
     function info.mousepressed(x, y, button)
@@ -77,14 +95,15 @@ function m.init(sheetInfo, width, height)
     end
 
     function info.draw()
+        local sprSize = sprites.spriteSize
         local padding = 24 * SCALE
         local scale = m.zoom * SCALE
 
         local x = info.x + padding + offsetX
         local y = padding + offsetY
 
-        local cx = math.floor((cursorX - x) / (CELL_SIZE * scale))
-        local cy = math.floor((cursorY - y) / (CELL_SIZE * scale))
+        local cx = math.floor((cursorX - x) / (sprSize * scale))
+        local cy = math.floor((cursorY - y) / (sprSize * scale))
 
         LG.setColor(COLOR.WHITE)
         LG.setCanvas(canvas)
@@ -93,11 +112,11 @@ function m.init(sheetInfo, width, height)
         LG.setColor(0.7, 0.7, 0.7, 0.5)
 
         if m.showGrid then
-            for y = 0, h, CELL_SIZE do
+            for y = 0, h, sprSize do
                 LG.line(0, y, w, y)
             end
 
-            for x = 0, w, CELL_SIZE do
+            for x = 0, w, sprSize do
                 LG.line(x, 0, x, h)
             end
         end
@@ -106,7 +125,17 @@ function m.init(sheetInfo, width, height)
 
         LG.setColor(1, 1, 1, 1)
 
-        LG.rectangle("fill", cx * CELL_SIZE, cy * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        for y = 0, cellH - 1 do
+            for x = 0, cellW - 1 do
+                local index = data[y + 1][x + 1]
+
+                if index ~= 0 then
+                    sprites.data[index].draw(x * sprSize, y * sprSize)
+                end
+            end
+        end
+
+        LG.rectangle("fill", cx * sprSize, cy * sprSize, sprSize, sprSize)
 
         LG.setCanvas()
         LG.setScissor(info.x, 0, WINDOW_W - info.y, WINDOW_H)
