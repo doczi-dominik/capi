@@ -111,17 +111,7 @@ function m.init(opts)
 
         LG.setColor(0.7, 0.7, 0.7, 0.5)
 
-        if m.showGrid then
-            for y = 0, h, sprSize do
-                LG.line(0, y, w, y)
-            end
-
-            for x = 0, w, sprSize do
-                LG.line(x, 0, x, h)
-            end
-        end
-
-        LG.rectangle("line", 0, 0, w, h)
+       
 
         LG.setColor(1, 1, 1, 1)
 
@@ -140,6 +130,27 @@ function m.init(opts)
         LG.setCanvas()
         LG.setScissor(info.x, 0, WINDOW_W - info.y, WINDOW_H)
         LG.draw(canvas, x, y, 0, scale, scale)
+
+        LG.setColor(0.7, 0.7, 0.7, 0.5)
+        LG.setLineWidth(2)
+
+        if m.showGrid then
+            for gy = 0, h, sprSize do
+                gy = gy * scale
+                LG.line(x, y + gy, x + w * scale, y + gy)
+            end
+
+            for gx = 0, w, sprSize do
+                gx = gx * scale
+                LG.line(x + gx, y, x + gx, y + h * scale)
+            end
+        end
+
+        LG.rectangle("line", x, y, w * scale, h * scale)
+
+        LG.setLineWidth(1)
+        LG.setColor(1, 1, 1, 1)
+
         LG.setScissor()
     end
 end
