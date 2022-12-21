@@ -14,7 +14,7 @@ local function createSprite(image, sx, sy, sw, sh, flags)
     s.flags = flags or {}
 
     function s.draw(x, y)
-        LG.draw(image, quad, x, y)
+        love.graphics.draw(image, quad, x, y)
     end
 
     return s
