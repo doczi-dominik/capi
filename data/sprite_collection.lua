@@ -2,6 +2,7 @@ local createSprite = require("data.sprite")
 
 ---@class spriteCollection
 ---@field data sprite[]
+---@field selectedIndex integer
 ---@field spriteSize integer
 ---@field addSpriteSheet fun(spritesheet: love.Image)
 
@@ -11,6 +12,7 @@ local function createCollection(spriteSize)
     local c = {}
 
     c.data = {}
+    c.selectedIndex = 0
     c.spriteSize = spriteSize
 
     ---@param spritesheet love.Image

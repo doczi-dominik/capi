@@ -44,14 +44,17 @@ local function getPosition()
     return x, y
 end
 
-local function screenToSheet(screenX, screenY)
+local function screenToCell(screenX, screenY)
     local baseX, baseY = getPosition()
     local div = sprites.spriteSize * m.zoom * SCALE
 
     local cellX = math.ceil((screenX - baseX) / div)
     local cellY = math.ceil((screenY - baseY) / div)
 
-    return cellX, cellY
+    local isXValid = 0 < cellX and cellX <= cellW
+    local isYValid = 0 < cellY and cellY <= cellH
+
+    return cellX, cellY, isXValid and isYValid
 end
 
 local function onLeftClick(x, y)
@@ -60,10 +63,21 @@ local function onLeftClick(x, y)
     dragStartOffsetY = offsetY
 end
 
-local function onRightClick(x, y)
-    local sheetX, sheetY = screenToSheet(x, y)
+local function onRightRelease(x, y)
+    local cellX, cellY = screenToCell(x, y)
 
-    data[sheetY][sheetX] = 0
+    data[cellY][cellX] = 0
+end
+
+local function onLeftRelease(x, y)
+    dragStartX, dragStartY = nil, nil
+    dragEnabled = false
+
+    local cellX, cellY, isValid = screenToCell(x, y)
+
+    if isValid then
+        data[cellY][cellX] = sprites.selectedIndex
+    end
 end
 
 m.zoom = 1
@@ -99,18 +113,15 @@ function m.init(opts)
     function info.mousepressed(x, y, button)
         if button == 1 then
             onLeftClick(x, y)
-        elseif button == 2 then
-            onRightClick(x, y)
         end
     end
 
     function info.mousereleased(x, y, button)
-        if button ~= 1 then
-            return
+        if button == 1 then
+            onLeftRelease(x, y)
+        elseif button == 2 then
+            onRightRelease(x, y)
         end
-
-        dragStartX, dragStartY = nil, nil
-        dragEnabled = false
     end
 
     function info.mousemoved(x, y)
@@ -151,7 +162,7 @@ function m.init(opts)
             end
         end
 
-        local selX, selY = screenToSheet(cursorX, cursorY)
+        local selX, selY = screenToCell(cursorX, cursorY)
 
         LG.rectangle("fill", selX * sprSize - sprSize, selY * sprSize - sprSize, sprSize, sprSize)
 
