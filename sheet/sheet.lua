@@ -1,5 +1,7 @@
 local m = {}
 
+local DESIGN_PADDING = 24
+
 local data  ---@type integer[][]
 local info  ---@type table
 local sprites  ---@type spriteCollection
@@ -33,6 +35,37 @@ local function updateDrag()
     end
 end
 
+local function getPosition()
+    local padding = DESIGN_PADDING * SCALE
+
+    local x = info.x + padding + offsetX
+    local y = padding + offsetY
+
+    return x, y
+end
+
+local function screenToSheet(screenX, screenY)
+    local baseX, baseY = getPosition()
+    local div = sprites.spriteSize * m.zoom * SCALE
+
+    local cellX = math.ceil((screenX - baseX) / div)
+    local cellY = math.ceil((screenY - baseY) / div)
+
+    return cellX, cellY
+end
+
+local function onLeftClick(x, y)
+    dragStartX, dragStartY = x, y
+    dragStartOffsetX = offsetX
+    dragStartOffsetY = offsetY
+end
+
+local function onRightClick(x, y)
+    local sheetX, sheetY = screenToSheet(x, y)
+
+    data[sheetY][sheetX] = 0
+end
+
 m.zoom = 1
 m.showGrid = true
 
@@ -54,7 +87,7 @@ function m.init(opts)
         data[y] = {}
 
         for x = 1, cellW do
-            data[y][x] = 0
+            data[y][x] = 1
         end
     end
 
@@ -64,9 +97,11 @@ function m.init(opts)
     canvas = LG.newCanvas(w, h)
 
     function info.mousepressed(x, y, button)
-        dragStartX, dragStartY = x, y
-        dragStartOffsetX = offsetX
-        dragStartOffsetY = offsetY
+        if button == 1 then
+            onLeftClick(x, y)
+        elseif button == 2 then
+            onRightClick(x, y)
+        end
     end
 
     function info.mousereleased(x, y, button)
@@ -102,18 +137,9 @@ function m.init(opts)
         local x = info.x + padding + offsetX
         local y = padding + offsetY
 
-        local cx = math.floor((cursorX - x) / (sprSize * scale))
-        local cy = math.floor((cursorY - y) / (sprSize * scale))
-
         LG.setColor(COLOR.WHITE)
         LG.setCanvas(canvas)
         LG.clear()
-
-        LG.setColor(0.7, 0.7, 0.7, 0.5)
-
-       
-
-        LG.setColor(1, 1, 1, 1)
 
         for y = 0, cellH - 1 do
             for x = 0, cellW - 1 do
@@ -125,10 +151,13 @@ function m.init(opts)
             end
         end
 
-        LG.rectangle("fill", cx * sprSize, cy * sprSize, sprSize, sprSize)
+        local selX, selY = screenToSheet(cursorX, cursorY)
+
+        LG.rectangle("fill", selX * sprSize - sprSize, selY * sprSize - sprSize, sprSize, sprSize)
 
         LG.setCanvas()
         LG.setScissor(info.x, 0, WINDOW_W - info.y, WINDOW_H)
+
         LG.draw(canvas, x, y, 0, scale, scale)
 
         LG.setColor(0.7, 0.7, 0.7, 0.5)
