@@ -25,7 +25,7 @@ ROOT.computeLayout()
 
 local spriteCollection = require("data.sprite_collection")(16)
 
-spriteCollection.addSpriteSheet(LG.newImage("assets/image/test.png"))
+spriteCollection.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
 
 SHEET = require("sheet.sheet")
 SHEET.init({
