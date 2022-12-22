@@ -2,42 +2,65 @@ local m = {}
 local fileManager = require("file_manager")
 
 function m.createSpriteSheet(spriteInfo)
-    local spriteSizeText = {}
+        
+    function m.newPalette(name,size)
+        local palette = {}
 
-    spriteInfo.selectionSize = 1
-    spriteInfo.spriteSize = 2
-    spriteInfo.importedFileData = nil
-    
-    local function reduceSprite()
-        spriteInfo.spriteSize = (spriteInfo.spriteSize - 3) % 17 + 1
-        spriteSizeText.setText(spriteInfo.spriteSize)
+        palette.name = name or ""
+        palette.size = size or ""
+
+        return palette
     end
-    
-    local function increaseSprite()
-        spriteInfo.spriteSize = (spriteInfo.spriteSize) % 17 + 1
-        spriteSizeText.setText(spriteInfo.spriteSize)
-    end
+
+    local paletteName = {}
+    local paletteSpriteSize = {}
+
 
     local function importFileData()
         spriteInfo.importedFileData = fileManager.fileDialogue()
     end
 
-    return {
-        DUI.newButton({sizeFactor = 0.09, text = "Import spritesheet", onClick = importFileData}, STYLE.STYLEDBUTTON),
+    local function createPalette()
+        spriteInfo.addItem(m.newPalette(paletteName.text,paletteSpriteSize.text))
+        paletteName.text = ""
+    end
+
+    function spriteInfo.draw(item,x,y,w,h)
+        LG.setColor(COLOR.BUTTON_COLOR)
+        LG.rectangle("fill",x + 4,y + 4,w - 8,h - 5)
+
+        LG.setColor(COLOR.BLACK)
+        LG.print(item.name,x,y)
+        LG.print(item.size,x,y + 10)
+    end
+
+   
+
+    return { 
         DUI.newHorizontalContainer({
             sizeFactor = 0.07,
             children = {
-                DUI.newButton({sizeFactor = 0.2, text = "<", onClick = reduceSprite},STYLE.STYLEDBUTTON),
-                DUI.newVerticalContainer({
-                    sizeFactor = 0.6,
-                    children = {
-                        DUI.newText({sizeFactor = 0.5,text = "Sprite size"}),
-                        DUI.newText({text = tostring(spriteInfo.spriteSize), outVar = spriteSizeText})
-                    }
-                }),
-                DUI.newButton({text = ">", onClick = increaseSprite},STYLE.STYLEDBUTTON)
+                DUI.newText({sizeFactor = 0.5,text = "Palette name:", alignmet = "left"}),
+                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName},STYLE.STYLEDTEXTINPUT)
+
             }
-        })            
+        }),   
+        DUI.newHorizontalContainer({
+            sizeFactor = 0.07,
+            children = {
+                DUI.newText({sizeFactor = 0.65,text = "Sprite dimension:", alignmet = "left"}),
+                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize},STYLE.STYLEDTEXTINPUT)
+
+            }
+        }),
+        DUI.newHorizontalContainer({
+            sizeFactor = 0.09,
+            children = {
+                DUI.newButton({sizeFactor = 0.5, margin = 2, text = "Import image", onClick = importFileData}, STYLE.STYLEDBUTTON),
+                DUI.newButton({sizeFactor = 0.5, margin = 2, text = "Create", onClick = createPalette}, STYLE.STYLEDBUTTON),
+            }
+        }),  
+        DUI.newListContainer({bg_color = COLOR.PRIMARY, color = COLOR.WHITE, outVar = spriteInfo})    
     }
 end
 

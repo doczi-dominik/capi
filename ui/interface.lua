@@ -2,13 +2,16 @@ local m = {}
 
 function m.createRoot(panelInfo, sheetInfo)
     local icons = {
-        gridButton = love.graphics.newImage("assets/icons/grid.png")
+        gridButton = LG.newImage("assets/icons/grid.png"),
+        moveButton = LG.newImage("assets/icons/move.png"),
+        paintbrushButton = LG.newImage("assets/icons/paintbrush.png")
     }
 
+    ---@class buttonOptions
     local barButtonStyle = {
         bg_color = COLOR.BUTTON_COLOR,
         highlight_color = COLOR.BUTTON_HIGHLIGHT,
-        sizeFactor = 1/3,
+        sizeFactor = 1/4,
         alignmet = "+90",
         color = COLOR.BLACK,
 
@@ -21,11 +24,20 @@ function m.createRoot(panelInfo, sheetInfo)
         end,
     }
 
+    ---@class buttonOptions
     local bottomBarButtonStyle = {
         bg_color = COLOR.BUTTON_COLOR,
         highlight_color = COLOR.BUTTON_HIGHLIGHT,
         sizeFactor = 0.04,
         margin = 3,
+    }
+
+    local tools = {
+        bg_color = COLOR.BUTTON_COLOR,
+        highlight_color = COLOR.BUTTON_HIGHLIGHT,
+        sizeFactor = 0.04,
+        margin = 3,
+        dependencyTable = {}
     }
 
     local barButtonOnClick = function(b)
@@ -34,7 +46,7 @@ function m.createRoot(panelInfo, sheetInfo)
     end
 
     local toggleGrid = function ()
-        
+        SHEET.showGrid = not SHEET.showGrid
     end
 
     return DUI.newMainContainer({ -- Main Window
@@ -51,7 +63,8 @@ function m.createRoot(panelInfo, sheetInfo)
                             children = {
                                 DUI.newButton({dependencyIndex = 1,text = "Spritesheet", onClick = barButtonOnClick, defaultOn = true}, barButtonStyle),
                                 DUI.newButton({dependencyIndex = 2,text = "Sprites", onClick = barButtonOnClick}, barButtonStyle),
-                                DUI.newButton({dependencyIndex = 3,text = "Export", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 3,text = "Flags", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 4,text = "Export", onClick = barButtonOnClick}, barButtonStyle),
                             }
                         }),
                         DUI.newVerticalContainer({ -- Panel 
@@ -69,7 +82,9 @@ function m.createRoot(panelInfo, sheetInfo)
                             bg_color = COLOR.PRIMARY,
                             padding = {0,1,0,1},
                             children = {  -- Bottom bar buttons
-                                DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid}, bottomBarButtonStyle)
+                                DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
+                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
+                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools)
                             }
                         })
                     }

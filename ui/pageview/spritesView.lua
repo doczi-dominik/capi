@@ -1,8 +1,9 @@
 local m = {}
 
 
-function m.createSprite(spriteInfo)
+function m.createSprite(spriteInfo,spritePalette)
     local spriteSelectText = {}
+    spriteInfo.selectionSize = 1
     
     local function reduceGrid()
         spriteInfo.selectionSize = (spriteInfo.selectionSize - 2) % 5 + 1
@@ -13,6 +14,12 @@ function m.createSprite(spriteInfo)
         spriteInfo.selectionSize = (spriteInfo.selectionSize) % 5 + 1
         spriteSelectText.setText(spriteInfo.selectionSize)
     end
+
+    function spritePalette.draw(t)
+        LG.rectangle("fill",t.x ,t.y,t.w,t.h)
+    end
+
+ 
 
     return {
         DUI.newHorizontalContainer({
@@ -29,7 +36,7 @@ function m.createSprite(spriteInfo)
                 DUI.newButton({text = ">", onClick = increaseGrid},STYLE.STYLEDBUTTON)
             }
         }),
-        DUI.newTextInput({sizeFactor = 0.1}, STYLE.STYLEDTEXTINPUT)
+        DUI.newContainer({outVar = spritePalette}), --- sprite palette container
     }
 end
 

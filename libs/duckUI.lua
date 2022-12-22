@@ -13,7 +13,7 @@ lib.current_focus = {}
 
 --#region
 
----@class options
+---@class baseClassOptions
 ---@field children table | any Optional library components
 ---@field bg_color {r:number,g:number,b:number,a:number} Background color
 ---@field debug_name string String used for finding the right component and debugging its info
@@ -22,26 +22,9 @@ lib.current_focus = {}
 ---@field padding number | {left: number,up: number,right: number,down: number}
 ---@field outVar table Used to export the components x,y,w,h and redirect its input
 ---@field sizeFactor number 0 > 1 | 0% > 100% Percentage of element size
----@field text string Text to display
----@field color {r:number,g:number,b:number,a:number} primary color
----@field alignmet "center" | "+90"
----@field onClick function Function to call when a button is pressed
----@field drawExt function Settable draw function that gets called before any other draw in the component
----@field highlight_color {r:number,g:number,b:number,a:number} The color that is set on an active button
----@field border_color {r:number,g:number,b:number,a:number} 
----@field border_size number
----@field toggleable boolean Sets the button to a toggle switch
----@field dependencyTable table
----@field dependencyIndex number
----@field sprite love.Image
----@field defaultOn boolean
----@field text_scale number
----@field child table
----@field bar_width number
----@field max_characters number
 
----@param options? options?
----@param style? options?
+---@param options? baseClassOptions
+---@param style? baseClassOptions
 function lib.baseClass(options, style)
     local c = {}
     options = options or {} ---@type table
@@ -60,7 +43,7 @@ function lib.baseClass(options, style)
         local temp = t
         t = {}
         for i =1,4 do
-            t[i] = temp
+            t[i] = temp * lib.getScale()
         end
 
         return t
@@ -107,7 +90,6 @@ function lib.baseClass(options, style)
             c.children[i].parent = c
         end
     end
-    
 
     return c
 end
@@ -118,8 +100,10 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class VerticalOptions : baseClassOptions
+
+---@param options? VerticalOptions
+---@param style? VerticalOptions
 function lib.newVerticalContainer(options, style)
     options = options or {}
     style = style or {}
@@ -163,8 +147,14 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class TextOptions : baseClassOptions
+---@field text string Text to display
+---@field alignmet "center" | "+90" | "left" | "rigth"
+---@field color {r:number,g:number,b:number,a:number} Primary color
+
+
+---@param options? TextOptions
+---@param style? TextOptions
 function lib.newText(options, style)
     options = options or {}
     style = style or {}
@@ -190,6 +180,10 @@ function lib.newText(options, style)
             c.y + c.h/2 + FONT:getWidth(c.text)/2,
             -math.pi/2,
             1,1)
+        elseif c.alignmet == "left" then
+                LG.print(c.text,c.x + c.padding[1],c.y + c.h / 2 - lib.default_font:getHeight()/2)
+        elseif c.alignmet == "right" then
+            LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
         end
     end
 
@@ -207,8 +201,10 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class HorizontalOptions : baseClassOptions
+
+---@param options? HorizontalOptions
+---@param style? HorizontalOptions
 function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
@@ -251,8 +247,18 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class textInputOptions : baseClassOptions
+---@field text string Text to display
+---@field bar_width number
+---@field max_characters number
+---@field border_color {r:number,g:number,b:number,a:number} 
+---@field border_size number
+---@field color {r:number,g:number,b:number,a:number} Primary color
+---@field filter "any" | "number"
+---@field alignmet "center" | "left" | "right"
+
+---@param options? textInputOptions
+---@param style? textInputOptions
 function lib.newTextInput(options, style)
     options = options or {}
     style = style or {}
@@ -263,11 +269,24 @@ function lib.newTextInput(options, style)
     c.border_color = style.border_color or options.border_color
     c.border_size = style.border_size or options.border_size or 0
     c.max_characters = style.max_characters or options.max_characters or 20
+    c.filter = style.filter or options.filter or "any"
+    c.alignmet = style.alignmet or options.alignmet or "left"
 
     function c.getTextLength()
         local byteOffset = utf8.offset(c.text, -1)
         return byteOffset or 0
     end
+
+    function c.outVar.setText(text)
+        c.text = text
+    end
+
+    if c.filter == "any" then
+        c.filter = "."
+    elseif c.filter == "number" then
+        c.filter = "%d"
+    end
+
 
     function c.draw()
         if c.border_color ~= nil then
@@ -286,7 +305,13 @@ function lib.newTextInput(options, style)
         if c.color ~= nil then
             LG.setColor(c.color)
             LG.setScissor(c.x + c.border_size,c.y + c.border_size,c.w -  c.border_size * 2,c.h -  c.border_size * 2)
-            LG.print(c.text,c.x + c.padding[1] + c.border_size,c.y + c.h / 2 - lib.default_font:getHeight()/2)
+            if c.alignmet == "left" then
+                LG.print(c.text,c.x + c.padding[1] + c.border_size,c.y + c.h / 2 - lib.default_font:getHeight()/2)
+            elseif c.alignmet == "center" then
+                LG.print(c.text,c.x + c.w / 2 - lib.default_font:getWidth(c.text)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
+            elseif c.alignmet == "right" then
+                LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
+            end
             LG.setScissor()
         end
     end
@@ -307,12 +332,14 @@ function lib.newTextInput(options, style)
         elseif key == "backspace" then
             c.text = string.sub(c.text,1,c.getTextLength() - 1)
         end
+        c.outVar.text = c.text
     end
 
     function c.textinput(t)
         if c.getTextLength() < c.max_characters then
-            c.text = c.text .. t
+            c.text = c.text .. (string.match(t,c.filter) or "")
         end
+        c.outVar.text = c.text
     end
 
     return c
@@ -325,8 +352,10 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class containerOptions : baseClassOptions
+
+---@param options? containerOptions
+---@param style? containerOptions
 function lib.newContainer(options, style)
     local c = lib.baseClass(options, style)
 
@@ -336,7 +365,7 @@ function lib.newContainer(options, style)
 
     function c:draw()
         if c.outVar.draw ~= nil then
-            c.outVar.draw()
+            c.outVar:draw()
         end
     end
 
@@ -362,20 +391,34 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class buttonOptions : baseClassOptions
+---@field onClick function Function to call when a button is pressed
+---@field drawExt function Settable draw function that gets called before any other draw in the component
+---@field highlight_color {r:number,g:number,b:number,a:number} The color that is set on an active button
+---@field border_color {r:number,g:number,b:number,a:number} 
+---@field border_size number
+---@field toggleable boolean Sets the button to a toggle switch
+---@field dependencyTable table
+---@field dependencyIndex number
+---@field sprite love.Image
+---@field defaultOn boolean
+---@field color {r:number,g:number,b:number,a:number} Primary color
+---@field text string Text to display
+---@field alignmet "center" | "+90"
+
+---@param options? buttonOptions
+---@param style? buttonOptions
 function lib.newButton(options, style)
     local c = lib.baseClass(options, style)
     style = style or {}
     options = options or {}
-    c.onClick = style.onClick or options.onClick
+    c.onClick = style.onClick or options.onClick or function () end
     c.drawExt = style.drawExt or options.drawExt
     c.color = style.color or options.color or {0,0,0}
     c.highlight_color = style.highlight_color or options.highlight_color 
     c.border_color = style.border_color or options.border_color
     c.border_size = style.border_size or options.border_size or 0
     c.text = options.text or ""
-    c.text_scale = style.text_scale or options.text_scale or 1 
     c.toggleable = style.toggleable or options.toggleable
     c.dependencyTable = style.dependencyTable or options.dependencyTable
     c.dependencyIndex = options.dependencyIndex
@@ -403,7 +446,7 @@ function lib.newButton(options, style)
     function c.mousepressed( x, y, button)
         if c.toggleable then
             c.isOn = not c.isOn
-
+            c:onClick()
         elseif c.dependencyIndex ~= nil then
             for i = 1, #c.dependencyTable do
                 c.dependencyTable[i].isOn = false
@@ -433,7 +476,7 @@ function lib.newButton(options, style)
             LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
         end
         if c.sprite ~= nil then
-            LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / c.sprite:getWidth() - c.border_size * 2, c.h / c.sprite:getHeight() - c.border_size * 2)
+            LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / (c.sprite:getWidth() - c.border_size * 2), c.h / (c.sprite:getHeight()- c.border_size * 2))
         end
 
         
@@ -456,17 +499,73 @@ end
 --#endregion
 
 
+------------ LIST CONTAINER -----------
+
+--#region
+
+---@class listContainerOptions : baseClassOptions
+---@field item_height number
+---@field items table
+---@field color {r:number,g:number,b:number,a:number} Primary color
+
+function lib.newListContainer(options, style)
+    local c = lib.baseClass(options,style)
+    options = options or {}
+    style = style or {}
+    c.item_height = style.item_height or options.item_height or 50
+    c.items = options.items or {}
+    c.color = style.color or options.color
+
+    function c.outVar.addItem(item)
+        table.insert(c.items,item)
+    end
+
+
+    function c.draw()
+        LG.setScissor(c.x,c.y,c.w,c.h)
+        if c.bg_color ~= nil then
+            LG.setColor(c.bg_color)
+            LG.rectangle(c.fillMode,c.x,c.y,c.w,c.h)
+        end
+
+        if c.color ~= nil then
+            LG.setColor(c.color)
+
+
+            for i = 1, #c.items do
+                if c.outVar.draw ~= nil then
+                    c.outVar.draw(c.items[i],c.x,c.y + (i - 1) * c.item_height,c.w,c.item_height)
+                else
+                    LG.print(tostring(c.items[i]),c.x, c.y + (i - 1) * c.item_height )
+                end
+            end
+        end
+        LG.setScissor()
+    end 
+
+    
+
+    return c
+end
+
+--#endregion
+
+
 ------------ SLIDER --------------
 
 --#region
 
----@param options? options
----@param style? options
+---@class sliderOptions : baseClassOptions
+
+---@param options? sliderOptions
+---@param style? sliderOptions
 function lib.newSlider(options, style)
     local c = lib.baseClass(options, style)
 
     function c.draw()
     end
+
+    return c
 end
 
 
@@ -477,8 +576,11 @@ end
 
 --#region
 
----@param options? options
----@param style? options
+---@class mainContainerOptions : baseClassOptions
+---@field child table
+
+---@param options? mainContainerOptions
+---@param style? mainContainerOptions
 function lib.newMainContainer(options, style)
     local c = lib.baseClass(options, style)
     options = options or {}
