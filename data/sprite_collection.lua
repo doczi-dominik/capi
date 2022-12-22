@@ -9,18 +9,18 @@ local templates = require("data.library_template")
 ---@field removeSpriteSheet fun(name: string)
 ---@field exportForLibrary fun()
 
+---@class sheetMetadata
+---@field name string
+---@field spritesheet love.ImageData
+
 ---@param spriteSize integer
 ---@return spriteCollection
 local function createCollection(spriteSize)
     local c = {}
 
-    ---@class sheetMetadata
-    ---@field name string
-    ---@field spritesheet love.ImageData
-
     c.sheets = {}   ---@type sheetMetadata[]
     c.data = {}
-    c.selectedIndex = 0
+    c.selectedIndex = 1
     c.spriteSize = spriteSize
 
     ---@param name string

@@ -2,11 +2,10 @@ local m = {}
 
 local DESIGN_PADDING = 24
 
-local data  ---@type integer[][][]
 local info  ---@type table
 local sprites  ---@type spriteCollection
+local cells  ---@type cellCollection
 local canvas  ---@type love.Canvas
-local cellW, cellH  ---@type integer, integer
 local w, h  ---@type integer, integer
 local cursorX, cursorY = love.mouse.getPosition()
 local offsetX, offsetY = 0, 0
@@ -44,70 +43,62 @@ local function getPosition()
     return x, y
 end
 
-local function screenToCell(screenX, screenY)
-    local baseX, baseY = getPosition()
-    local div = sprites.spriteSize * m.zoom * SCALE
-
-    local cellX = math.ceil((screenX - baseX) / div)
-    local cellY = math.ceil((screenY - baseY) / div)
-
-    local isXValid = 0 < cellX and cellX <= cellW
-    local isYValid = 0 < cellY and cellY <= cellH
-
-    return cellX, cellY, isXValid and isYValid
-end
-
-local function onLeftClick(x, y)
-    dragStartX, dragStartY = x, y
-    dragStartOffsetX = offsetX
-    dragStartOffsetY = offsetY
-end
-
-local function onRightRelease(x, y)
-    local cellX, cellY, isValid = screenToCell(x, y)
-
-    if isValid then
-        local cell = data[cellY][cellX]
-
-        table.remove(cell, #cell)
-    end
-end
-
-local function onLeftRelease(x, y)
-    dragStartX, dragStartY = nil, nil
-    dragEnabled = false
-
-    local cellX, cellY, isValid = screenToCell(x, y)
-
-    if isValid then
-        local cell = data[cellY][cellX]
-
-        cell[#cell+1] = sprites.selectedIndex
-    end
-end
-
 m.zoom = 1
 m.showGrid = true
 
 ---@class sheetInitOptions
 ---@field info table info table used by `duckUI` to maintain layout information
----@field width integer the width of the sheet **in cells**
----@field height integer the height of the sheet **in cells**
 ---@field sprites spriteCollection reference to the main spriteCollection
+---@field cells cellCollection reference to the main cellCollection
 
 ---@param opts sheetInitOptions
 function m.init(opts)
     info = opts.info
     sprites = opts.sprites
-    cellW, cellH = opts.width, opts.height
+    cells = opts.cells
 
-    data = {}
+    local cellW = cells.width
+    local cellH = cells.height
 
-    for y = 1, cellH do
-        data[y] = {}
+    local function screenToCell(screenX, screenY)
+        local baseX, baseY = getPosition()
+        local div = sprites.spriteSize * m.zoom * SCALE
 
-        for x = 1, cellW do
-            data[y][x] = {0}
+        local cellX = math.ceil((screenX - baseX) / div)
+        local cellY = math.ceil((screenY - baseY) / div)
+
+        local isXValid = 0 < cellX and cellX <= cellW
+        local isYValid = 0 < cellY and cellY <= cellH
+
+        return cellX, cellY, isXValid and isYValid
+    end
+
+    local function onLeftClick(x, y)
+        dragStartX, dragStartY = x, y
+        dragStartOffsetX = offsetX
+        dragStartOffsetY = offsetY
+    end
+
+    local function onRightRelease(x, y)
+        local cellX, cellY, isValid = screenToCell(x, y)
+
+        if isValid then
+            local cell = cells.data[cellY][cellX].sprites
+
+            table.remove(cell, #cell)
+        end
+    end
+
+    local function onLeftRelease(x, y)
+        dragStartX, dragStartY = nil, nil
+        dragEnabled = false
+
+        local cellX, cellY, isValid = screenToCell(x, y)
+
+        if isValid then
+            local cell = cells.data[cellY][cellX].sprites
+
+            cell[#cell+1] = sprites.selectedIndex
         end
     end
 
@@ -160,12 +151,10 @@ function m.init(opts)
 
         for y = 0, cellH - 1 do
             for x = 0, cellW - 1 do
-                local cell = data[y + 1][x + 1]
+                local cell = cells.data[y + 1][x + 1]
 
-                for _, i in ipairs(cell) do
-                    if i ~= 0 then
-                        sprites.data[i].draw(x * sprSize, y * sprSize)
-                    end
+                for _, i in ipairs(cell.sprites) do
+                    sprites.data[i].draw(x * sprSize, y * sprSize)
                 end
             end
         end

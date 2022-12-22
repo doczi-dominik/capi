@@ -27,12 +27,13 @@ local spriteCollection = require("data.sprite_collection")(16)
 
 spriteCollection.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
 
+local cellCollection = require("data.cell_collection")(8, 8)
+
 SHEET = require("sheet.sheet")
 SHEET.init({
     info = sheetInfo,
-    width = 8,
-    height = 8,
-    sprites = spriteCollection
+    sprites = spriteCollection,
+    cells = cellCollection
 })
 
 PAGES = {
