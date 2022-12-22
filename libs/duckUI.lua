@@ -16,6 +16,34 @@ lib.window_w,lib.window_h = LG.getDimensions()
 
 --------------- BASECLASS ---------------
 
+---@class options
+---@field children table | any Optional library components
+---@field bg_color {r:number,g:number,b:number,a:number} Background color
+---@field debug_name string String used for finding the right component and debugging its info
+---@field fillMode "fill" | "line"
+---@field margin number | {left: number,up: number,right: number,down: number}
+---@field padding number | {left: number,up: number,right: number,down: number}
+---@field outVar table Used to export the components x,y,w,h and redirect its input
+---@field sizeFactor number 0 > 1 | 0% > 100% Percentage of element size
+---@field text string Text to display
+---@field color {r:number,g:number,b:number,a:number} Text color
+---@field alignmet "center" | "+90"
+---@field onClick function Function to call when a button is pressed
+---@field drawExt function Settable draw function that gets called before any other draw in the component
+---@field highlight_color {r:number,g:number,b:number,a:number} The color that is set on an active button
+---@field border_color {r:number,g:number,b:number,a:number} 
+---@field border_size number
+---@field toggleable boolean Sets the button to a toggle switch
+---@field dependencyTable table
+---@field dependencyIndex number
+---@field sprite love.Image
+---@field defaultOn boolean
+---@field text_scale number
+---@field child table
+
+---comment
+---@param options? options?
+---@param style? options?
 function lib.baseClass(options, style)
     local c = {}
     options = options or {} ---@type table
@@ -24,11 +52,11 @@ function lib.baseClass(options, style)
     c.children = options.children or {} ---@type table
     c.parent = c.parent or {}   ---@type table
     c.outVar = options.outVar or {} ---@type table
-    c.padding = style.padding or options.padding or 0   ---@type number | table [ right, down, left, right ]
+    c.padding = style.padding or options.padding or 0   ---@type number | {left: number,up: number,right: number,down: number}
     c.bg_color = style.bg_color or options.bg_color ---@type table 
     c.fillMode = style.fillMode or options.fillMode or "fill" ---@alias modes "fill" | "line" 
-    c.sizeFactor = style.sizeFactor or options.sizeFactor or 1  ---@type number #0 to 1 | 0% > 100%
-    c.margin = style.margin or options.margin or 0  ---@type number | table [ right, down, left, right ]
+    c.sizeFactor = style.sizeFactor or options.sizeFactor or 1  ---@type number 0 > 1 | 0% > 100% Percentage of element size
+    c.margin = style.margin or options.margin or 0  ---@type number | {left: number,up: number,right: number,down: number}
 
     local function handleNumberInput(t)
         local temp = t
@@ -89,6 +117,8 @@ end
 
 ------------ VERTICAL CONTAINER -------------
 
+---@param options? options
+---@param style? options
 function lib.newVerticalContainer(options, style)
     options = options or {}
     style = style or {}
@@ -128,6 +158,8 @@ end
 
 ----------------- TEXT -------------------
 
+---@param options? options
+---@param style? options
 function lib.newText(options, style)
     options = options or {}
     style = style or {}
@@ -166,6 +198,8 @@ end
 
 ------------ HORIZONTAL CONTAINER -------------
 
+---@param options? options
+---@param style? options
 function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
@@ -204,6 +238,8 @@ end
 
 ------------ CONTAINER -----------------
 
+---@param options? options
+---@param style? options
 function lib.newContainer(options, style)
     local c = lib.baseClass(options, style)
 
@@ -235,9 +271,13 @@ end
 
 ------------ BUTTON -------------
 
+
+---@param options? options
+---@param style? options
 function lib.newButton(options, style)
     local c = lib.baseClass(options, style)
     style = style or {}
+    options = options or {}
     c.onClick = style.onClick or options.onClick
     c.drawExt = style.drawExt or options.drawExt
     c.color = style.color or options.color or {0,0,0}
@@ -245,7 +285,7 @@ function lib.newButton(options, style)
     c.border_color = style.border_color or options.border_color
     c.border_size = style.border_size or options.border_size or 0
     c.text = options.text or ""
-    c.text_scale = style.text_scale or options.text_scale or 1
+    c.text_scale = style.text_scale or options.text_scale or 1 
     c.toggleable = style.toggleable or options.toggleable
     c.dependencyTable = style.dependencyTable or options.dependencyTable
     c.dependencyIndex = options.dependencyIndex
@@ -329,6 +369,8 @@ end
 
 ------------ SLIDER --------------
 
+---@param options? options
+---@param style? options
 function lib.newSlider(options, style)
     local c = lib.baseClass(options, style)
 
@@ -340,9 +382,11 @@ end
 
 ------------ MAIN CONTAINER -------------
 
+---@param options? options
+---@param style? options
 function lib.newMainContainer(options, style)
     local c = lib.baseClass(options, style)
-
+    options = options or {}
     c.child = options.child or {}
 
     function c.draw()

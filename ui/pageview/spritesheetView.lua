@@ -32,7 +32,7 @@ function m.createSpriteSheet(spriteInfo)
                     sizeFactor = 0.6,
                     children = {
                         DUI.newText({sizeFactor = 0.5,text = "Sprite size"}),
-                        DUI.newText({text = spriteInfo.spriteSize, outVar = spriteSizeText})
+                        DUI.newText({text = tostring(spriteInfo.spriteSize), outVar = spriteSizeText})
                     }
                 }),
                 DUI.newButton({text = ">", onClick = increaseSprite},STYLE.STYLEDBUTTON)

@@ -1,4 +1,3 @@
-
 local m = {}
 
 function m.createRoot(panelInfo, sheetInfo)
