@@ -212,7 +212,9 @@ function lib.newContainer(options, style)
     end
 
     function c:draw()
-        c.outVar.draw()
+        if c.outVar.draw ~= nil then
+            c.outVar.draw()
+        end
     end
 
     function c.mouseInput(x, y, button, type)
@@ -247,6 +249,7 @@ function lib.newButton(options, style)
     c.toggleable = style.toggleable or options.toggleable
     c.dependencyTable = style.dependencyTable or options.dependencyTable
     c.dependencyIndex = options.dependencyIndex
+    c.sprite = style.sprite or options.sprite
     c.alignmet = style.alignmet or options.alignmet or "center"
     c.defaultOn = style.defaultOn or options.defaultOn or false
     c.isOn = c.defaultOn
@@ -298,6 +301,9 @@ function lib.newButton(options, style)
         elseif c.bg_color ~= nil then
             LG.setColor(c.bg_color)
             LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
+        end
+        if c.sprite ~= nil then
+            LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / c.sprite:getWidth() - c.border_size * 2, c.h / c.sprite:getHeight() - c.border_size * 2)
         end
 
         

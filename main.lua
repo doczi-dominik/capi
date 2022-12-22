@@ -29,8 +29,8 @@ SHEET.init(sheetInfo, 8, 8)
 
 PAGES = {
     require("ui.pageview.spritesheetView").createSpriteSheet(spriteInfo),
-    require("ui.pageview.nemtom"),
-    require("ui.pageview.exportView")
+    require("ui.pageview.spritesView").createSprite(spriteInfo),
+    require("ui.pageview.exportView").createExportView()
 }
 
 panelInfo.setChild(PAGES[1])

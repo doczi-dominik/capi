@@ -2,23 +2,11 @@ local m = {}
 local fileManager = require("file_manager")
 
 function m.createSpriteSheet(spriteInfo)
-    local spriteSelectText = {}
     local spriteSizeText = {}
 
     spriteInfo.selectionSize = 1
     spriteInfo.spriteSize = 2
     spriteInfo.importedFileData = nil
-
-
-    local function reduceGrid()
-        spriteInfo.selectionSize = (spriteInfo.selectionSize - 2) % 5 + 1
-        spriteSelectText.setText(spriteInfo.selectionSize)
-    end
-    
-    local function increaseGrid()
-        spriteInfo.selectionSize = (spriteInfo.selectionSize) % 5 + 1
-        spriteSelectText.setText(spriteInfo.selectionSize)
-    end
     
     local function reduceSprite()
         spriteInfo.spriteSize = (spriteInfo.spriteSize - 3) % 17 + 1
@@ -35,24 +23,9 @@ function m.createSpriteSheet(spriteInfo)
     end
 
     return {
-        DUI.newButton({sizeFactor = 0.10, text = "Import spritesheet", onClick = importFileData}, STYLE.STYLEDBUTTON),
+        DUI.newButton({sizeFactor = 0.09, text = "Import spritesheet", onClick = importFileData}, STYLE.STYLEDBUTTON),
         DUI.newHorizontalContainer({
-            debug_name = "edit buttons",
-            sizeFactor = 0.08,
-            children = {
-                DUI.newButton({sizeFactor = 0.2, text = "<", onClick = reduceGrid},STYLE.STYLEDBUTTON),
-                DUI.newVerticalContainer({
-                    sizeFactor = 0.6,
-                    children = {
-                        DUI.newText({sizeFactor = 0.5,text = "Selection size"}),
-                        DUI.newText({text = spriteInfo.selectionSize,outVar = spriteSelectText})
-                    }
-                }),
-                DUI.newButton({text = ">", onClick = increaseGrid},STYLE.STYLEDBUTTON)
-            }
-        }),
-        DUI.newHorizontalContainer({
-            sizeFactor = 0.08,
+            sizeFactor = 0.07,
             children = {
                 DUI.newButton({sizeFactor = 0.2, text = "<", onClick = reduceSprite},STYLE.STYLEDBUTTON),
                 DUI.newVerticalContainer({
