@@ -2,7 +2,7 @@ local m = {}
 
 local DESIGN_PADDING = 24
 
-local data  ---@type integer[][]
+local data  ---@type integer[][][]
 local info  ---@type table
 local sprites  ---@type spriteCollection
 local canvas  ---@type love.Canvas
@@ -64,9 +64,13 @@ local function onLeftClick(x, y)
 end
 
 local function onRightRelease(x, y)
-    local cellX, cellY = screenToCell(x, y)
+    local cellX, cellY, isValid = screenToCell(x, y)
 
-    data[cellY][cellX] = 0
+    if isValid then
+        local cell = data[cellY][cellX]
+
+        table.remove(cell, #cell)
+    end
 end
 
 local function onLeftRelease(x, y)
@@ -76,7 +80,9 @@ local function onLeftRelease(x, y)
     local cellX, cellY, isValid = screenToCell(x, y)
 
     if isValid then
-        data[cellY][cellX] = sprites.selectedIndex
+        local cell = data[cellY][cellX]
+
+        cell[#cell+1] = sprites.selectedIndex
     end
 end
 
@@ -101,7 +107,7 @@ function m.init(opts)
         data[y] = {}
 
         for x = 1, cellW do
-            data[y][x] = 1
+            data[y][x] = {0}
         end
     end
 
@@ -154,10 +160,12 @@ function m.init(opts)
 
         for y = 0, cellH - 1 do
             for x = 0, cellW - 1 do
-                local index = data[y + 1][x + 1]
+                local cell = data[y + 1][x + 1]
 
-                if index ~= 0 then
-                    sprites.data[index].draw(x * sprSize, y * sprSize)
+                for _, i in ipairs(cell) do
+                    if i ~= 0 then
+                        sprites.data[i].draw(x * sprSize, y * sprSize)
+                    end
                 end
             end
         end
