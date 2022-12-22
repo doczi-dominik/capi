@@ -13,7 +13,7 @@ function m.createRoot(panelInfo, sheetInfo)
 
         drawExt = function (self)
             if self.isOn then
-                self.w = self.tw + self.parent.padding * 2
+                self.w = self.tw + self.parent.padding[3] * 2+ self.parent.margin[3] * 2
             end
         end,
     }
@@ -23,32 +23,39 @@ function m.createRoot(panelInfo, sheetInfo)
         ROOT.computeLayout()
     end
 
-    return DUI.newMainContainer({
+    return DUI.newMainContainer({ -- Main Window
         child = DUI.newHorizontalContainer({
             children = {
-                DUI.newHorizontalContainer({ -- sidebar container
+                DUI.newHorizontalContainer({ -- Side panel
                     sizeFactor = 0.3,
                     bg_color = COLOR.PRIMARY,
                     children = {
-                        DUI.newVerticalContainer({-- actionbar
-                            sizeFactor = 0.13,
-                            padding = 5,
+                        DUI.newVerticalContainer({ -- Actionbar
+                            sizeFactor = 0.11,
+                            margin = 3,
+                            padding = {2,2,0,2},
                             children = {
                                 DUI.newButton({dependencyIndex = 1,text = "draw", onClick = barButtonOnClick, defaultOn = true}, barButtonStyle),
                                 DUI.newButton({dependencyIndex = 2,text = "spritesheet", onClick = barButtonOnClick}, barButtonStyle),
                                 DUI.newButton({dependencyIndex = 3,text = "spritesheet", onClick = barButtonOnClick}, barButtonStyle),
                             }
                         }),
-                        DUI.newVerticalContainer({
+                        DUI.newVerticalContainer({ -- Panel
                             bg_color = COLOR.BUTTON_HIGHLIGHT,
                             margin = 5,
-                            debug_name = "mukodj",
                             padding = 6,
                             outVar = panelInfo
                         })
                     }
                 }),
-                DUI.newContainer({outVar = sheetInfo})
+                DUI.newVerticalContainer({ -- Editor winow
+                    children = {
+                        DUI.newContainer({outVar = sheetInfo, sizeFactor = 0.95}),
+                        DUI.newHorizontalContainer({
+                            bg_color = COLOR.PRIMARY
+                        })
+                    }
+                }) 
             }
         })})
 end

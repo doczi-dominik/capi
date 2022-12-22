@@ -1,3 +1,4 @@
+---@enum color
 COLOR = {
     PRIMARY = {110/255,45/255,45/255},
     BUTTON_HIGHLIGHT = {206/255,119/255,119/255},

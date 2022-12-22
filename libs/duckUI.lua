@@ -6,24 +6,48 @@ lib.default_color = {1,1,1}
 lib.default_font = LG.getFont()
 lib.window_w,lib.window_h = LG.getDimensions()
 
+--[[
+        padding/margin
+    x       y       w       h
+    left   up    right    down
 
+]]
 
 
 --------------- BASECLASS ---------------
 
 function lib.baseClass(options, style)
     local c = {}
-    options = options or {}
-    style = style or {}
-    c.debug_name = options.debug_name or ""
-    c.children = options.children or {}
-    c.parent = c.parent or {}
-    c.outVar = options.outVar or {}
-    c.padding = style.padding or options.padding or 0
-    c.bg_color = style.bg_color or options.bg_color
-    c.fillMode = style.fillMode or options.fillMode or "fill"
-    c.sizeFactor = style.sizeFactor or options.sizeFactor or 1
-    c.margin = style.margin or options.margin or 0
+    options = options or {} ---@type table
+    style = style or {} ---@type table
+    c.debug_name = options.debug_name or "" ---@type string
+    c.children = options.children or {} ---@type table
+    c.parent = c.parent or {}   ---@type table
+    c.outVar = options.outVar or {} ---@type table
+    c.padding = style.padding or options.padding or 0   ---@type number | table [ right, down, left, right ]
+    c.bg_color = style.bg_color or options.bg_color ---@type table 
+    c.fillMode = style.fillMode or options.fillMode or "fill" ---@alias modes "fill" | "line" 
+    c.sizeFactor = style.sizeFactor or options.sizeFactor or 1  ---@type number #0 to 1 | 0% > 100%
+    c.margin = style.margin or options.margin or 0  ---@type number | table [ right, down, left, right ]
+
+    local function handleNumberInput(t)
+        local temp = t
+        t = {}
+        for i =1,4 do
+            t[i] = temp
+        end
+
+        return t
+    end
+
+    if type(c.padding) == "number" then
+        c.padding = handleNumberInput(c.padding)
+    end
+
+    if type(c.margin) == "number" then
+        c.margin = handleNumberInput(c.margin)
+    end
+
 
     for i = 1,#c.children do
         c.children[i].parent = c
@@ -42,7 +66,7 @@ function lib.baseClass(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
     end
 
     function c.mouseInput( x, y, button, type)
@@ -71,11 +95,11 @@ function lib.newVerticalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cy = c.y
         for i=1,#c.children do
             local ch = c.h * c.children[i].sizeFactor           
-            c.children[i].computeLayout(c.x + c.padding, cy + c.padding ,c.w - c.padding * 2,math.min(ch, c.h-cy + c.y) - c.padding * 2)
+            c.children[i].computeLayout(c.x + c.padding[1], cy + c.padding[2] ,c.w - c.padding[3] * 2,math.min(ch, c.h-cy + c.y) - c.padding[4] * 2)
 
             cy = cy + ch
         end
@@ -90,7 +114,7 @@ function lib.newVerticalContainer(options, style)
         local ccy = c.y
         for i = 1, #c.children do
             
-            ccy = ccy + (c.children[i].sizeFactor * c.h) + c.padding
+            ccy = ccy + (c.children[i].sizeFactor * c.h) + c.padding[2]
             if cy < ccy and cy > lastcy then
                 c.children[i].mouseInput( x, y, button, type)
                 break
@@ -114,7 +138,7 @@ function lib.newText(options, style)
     c.tw = 0
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         c.tw = w
     end
 
@@ -146,15 +170,15 @@ function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cx = c.x
         for i=1,#c.children do
             local cw = c.w * c.children[i].sizeFactor
             c.children[i].computeLayout(
-                cx + c.padding,
-                y + c.padding,
-                math.min(cw,c.w - cx + c.x),
-                c.h - c.padding * 2)
+                cx + c.padding[1],
+                y + c.padding[2],
+                math.min(cw,c.w - cx + c.x) - c.padding[3] * 2,
+                c.h - c.padding[4] * 2)
             cx = cx + cw
         end
     end
@@ -166,7 +190,7 @@ function lib.newHorizontalContainer(options, style)
         end
         local ccx = c.x
         for i = 1, #c.children do
-            ccx = ccx + (c.children[i].sizeFactor * c.w) + c.padding
+            ccx = ccx + (c.children[i].sizeFactor * c.w) + c.padding[1]
             if cx < ccx then
                 c.children[i].mouseInput( x, y, button,type)
                 break
@@ -233,7 +257,7 @@ function lib.newButton(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin,y + c.margin,w - c.margin * 2,h - c.margin * 2
+        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         c.tw = w
     end
 
@@ -344,19 +368,29 @@ function lib.getScale()
     return math.min(lib.window_w / lib.default_res[1], lib.window_h / lib.default_res[2])
 end
 
+---Resizes the current window
+---@param w number
+---@param h number
 function lib.resize(w,h)
     lib.window_w = w
     lib.window_h = h
 end
 
+---Sets the default detail color of the library
+---@param color table
 function lib.setDefaultColor(color)
     lib.default_color = color
 end
 
+---Sets the default library resolution
+---@param w number
+---@param h number
 function lib.setDefaultResolution(w,h)
     lib.default_res = {w,h}
 end
 
+---Sets the default library font
+---@param font love.Font
 function lib.setDefaultFont(font)
     lib.default_font = font
 end
