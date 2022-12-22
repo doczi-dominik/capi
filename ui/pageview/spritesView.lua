@@ -23,13 +23,13 @@ function m.createSprite(spriteInfo)
                     sizeFactor = 0.6,
                     children = {
                         DUI.newText({sizeFactor = 0.5,text = "Selection size"}),
-                        DUI.newText({text = spriteInfo.selectionSize,outVar = spriteSelectText})
+                        DUI.newText({text = tostring(spriteInfo.selectionSize),outVar = spriteSelectText})
                     }
                 }),
                 DUI.newButton({text = ">", onClick = increaseGrid},STYLE.STYLEDBUTTON)
             }
         }),
-        DUI.newContainer({outVar = {}})
+        DUI.newTextInput({sizeFactor = 0.1}, STYLE.STYLEDTEXTINPUT)
     }
 end
 

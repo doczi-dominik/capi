@@ -1,20 +1,17 @@
 ---@diagnostic disable: duplicate-set-field
+local utf8 = require("utf8")
+
 local lib = {}
 
 local LG = love.graphics
 lib.default_color = {1,1,1}
 lib.default_font = LG.getFont()
 lib.window_w,lib.window_h = LG.getDimensions()
-
---[[
-        padding/margin
-    x       y       w       h
-    left   up    right    down
-
-]]
-
+lib.current_focus = {}
 
 --------------- BASECLASS ---------------
+
+--#region
 
 ---@class options
 ---@field children table | any Optional library components
@@ -26,7 +23,7 @@ lib.window_w,lib.window_h = LG.getDimensions()
 ---@field outVar table Used to export the components x,y,w,h and redirect its input
 ---@field sizeFactor number 0 > 1 | 0% > 100% Percentage of element size
 ---@field text string Text to display
----@field color {r:number,g:number,b:number,a:number} Text color
+---@field color {r:number,g:number,b:number,a:number} primary color
 ---@field alignmet "center" | "+90"
 ---@field onClick function Function to call when a button is pressed
 ---@field drawExt function Settable draw function that gets called before any other draw in the component
@@ -40,8 +37,9 @@ lib.window_w,lib.window_h = LG.getDimensions()
 ---@field defaultOn boolean
 ---@field text_scale number
 ---@field child table
+---@field bar_width number
+---@field max_characters number
 
----comment
 ---@param options? options?
 ---@param style? options?
 function lib.baseClass(options, style)
@@ -109,13 +107,16 @@ function lib.baseClass(options, style)
             c.children[i].parent = c
         end
     end
+    
 
     return c
 end
-
+--#endregion
 
 
 ------------ VERTICAL CONTAINER -------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -155,8 +156,12 @@ function lib.newVerticalContainer(options, style)
 
     return c
 end
+--#endregion
+
 
 ----------------- TEXT -------------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -195,8 +200,12 @@ function lib.newText(options, style)
     return c
 end
 
+--#endregion
+
 
 ------------ HORIZONTAL CONTAINER -------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -235,8 +244,86 @@ function lib.newHorizontalContainer(options, style)
 
     return c
 end
+--#endregion
+
+
+------------ TEXT INPUT -------------
+
+--#region
+
+---@param options? options
+---@param style? options
+function lib.newTextInput(options, style)
+    options = options or {}
+    style = style or {}
+    local c = lib.baseClass(options, style)
+    c.text = style.text or options.text or ""
+    c.bar_width = style.bar_width or options.bar_width or 10
+    c.color = style.color or options.color or COLOR.WHITE
+    c.border_color = style.border_color or options.border_color
+    c.border_size = style.border_size or options.border_size or 0
+    c.max_characters = style.max_characters or options.max_characters or 20
+
+    function c.getTextLength()
+        local byteOffset = utf8.offset(c.text, -1)
+        return byteOffset or 0
+    end
+
+    function c.draw()
+        if c.border_color ~= nil then
+            LG.setColor(c.border_color)
+            LG.rectangle("fill",c.x,c.y,c.w,c.h)
+        end
+
+        if c.highlight_color ~= nil and c.isOn then
+            LG.setColor(c.highlight_color)
+            LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
+        elseif c.bg_color ~= nil then
+            LG.setColor(c.bg_color)
+            LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
+        end
+
+        if c.color ~= nil then
+            LG.setColor(c.color)
+            LG.setScissor(c.x + c.border_size,c.y + c.border_size,c.w -  c.border_size * 2,c.h -  c.border_size * 2)
+            LG.print(c.text,c.x + c.padding[1] + c.border_size,c.y + c.h / 2 - lib.default_font:getHeight()/2)
+            LG.setScissor()
+        end
+    end
+
+    function c.mouseInput(x,y,button, type)
+        if type == "mousepressed" then
+            c.mousepressed(x,y,button)
+        end
+    end
+
+    function c.mousepressed(x,y,button)
+        lib.current_focus = c
+    end
+
+    function c.keypressed(key, scancode, isrepeat)
+        if key == "return" then
+            lib.current_focus = {}
+        elseif key == "backspace" then
+            c.text = string.sub(c.text,1,c.getTextLength() - 1)
+        end
+    end
+
+    function c.textinput(t)
+        if c.getTextLength() < c.max_characters then
+            c.text = c.text .. t
+        end
+    end
+
+    return c
+end
+
+--#endregion
+
 
 ------------ CONTAINER -----------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -268,9 +355,12 @@ function lib.newContainer(options, style)
     return c
 end
 
+--#endregion
+
 
 ------------ BUTTON -------------
 
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -358,16 +448,17 @@ function lib.newButton(options, style)
             c.y + c.h/2 + FONT:getWidth(c.text)/2,
             -math.pi/2,
             1,1)
-        end
-
-        
+        end     
     end
 
     return c
 end
+--#endregion
 
 
 ------------ SLIDER --------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -379,8 +470,12 @@ function lib.newSlider(options, style)
 end
 
 
+--#endregion
 
------------- MAIN CONTAINER -------------
+
+------------ MAIN CONTAINER ------------
+
+--#region
 
 ---@param options? options
 ---@param style? options
@@ -404,15 +499,29 @@ function lib.newMainContainer(options, style)
     end
 
     function c.mouseInput(x, y, button, type)
+        if type == "mousepressed" then
+            c.mousepressed()
+        end
         c.child.mouseInput(x, y, button, type)
+    end
+    
+    function c.mousepressed()
+        lib.current_focus = {}
     end
 
     return c
 end
 
 
+--#endregion
+
 
 --------- CONFIG FUNCTIONS -----------
+
+--#region
+function lib.load()
+    love.keyboard.setKeyRepeat(true)
+end
 
 function lib.getScale()
     return math.min(lib.window_w / lib.default_res[1], lib.window_h / lib.default_res[2])
@@ -443,6 +552,28 @@ end
 ---@param font love.Font
 function lib.setDefaultFont(font)
     lib.default_font = font
+end
+--#endregion
+
+
+----------- UPDATE ---------
+
+function lib.update()
+    if lib.current_focus.update ~= nil then
+        lib.current_focus.update()
+    end
+end
+
+function lib.keypressed(key, scancode, isrepeat)
+    if lib.current_focus.keypressed ~= nil then
+        lib.current_focus.keypressed(key, scancode, isrepeat)
+    end
+end
+
+function lib.textinput(t)
+    if lib.current_focus.textinput ~= nil then
+        lib.current_focus.textinput(t)
+    end
 end
 
 

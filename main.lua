@@ -35,6 +35,12 @@ PAGES = {
 
 panelInfo.setChild(PAGES[1])
 
+--#region
+
+function love.load()
+    DUI.load()
+end
+
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
     SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
@@ -42,7 +48,6 @@ function love.resize(w, h)
     DUI.resize(w,h)
     ROOT.computeLayout()
 end
-
 
 function love.mousepressed(x, y, button)
     ROOT.mouseInput(x, y, button, "mousepressed")
@@ -66,5 +71,15 @@ end
 function love.draw()
     ROOT.draw()
 end
+
+function love.keypressed(key, scancode, isrepeat)
+    DUI.keypressed(key, scancode, isrepeat)
+end
+
+function love.textinput(t)
+    DUI.textinput(t)
+end
+
+--#endregion
 
 love.resize(LG.getDimensions())
