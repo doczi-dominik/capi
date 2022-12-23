@@ -21,6 +21,7 @@ local sheetInfo = {}
 local panelInfo =  {}
 local spriteInfo = {}
 local spritePalette = {}
+local flagInfo = {}
 
 ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
@@ -31,8 +32,8 @@ SHEET.init(sheetInfo, 8, 8)
 PAGES = {
     require("ui.pageview.spritesheetView").createSpriteSheet(spriteInfo),
     require("ui.pageview.spritesView").createSprite(spriteInfo,spritePalette),
-    require("ui.pageview.flagView").createFlagView(),
-    require("ui.pageview.exportView").createExportView()
+    require("ui.pageview.flagView").createFlagView(flagInfo),
+    require("ui.pageview.projectView").createExportView()
 }
 
 panelInfo.setChild(PAGES[1])

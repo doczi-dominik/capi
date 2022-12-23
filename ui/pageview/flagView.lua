@@ -1,11 +1,8 @@
 local m = {}
 
-function m.createFlagView()
+function m.createFlagView(flagInfo)
 
-    local function export()
-        
-    end
-
+    
 
     return {
         DUI.newText({sizeFactor = 0.05, text = "Flags"}),

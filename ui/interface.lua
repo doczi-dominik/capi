@@ -7,6 +7,8 @@ function m.createRoot(panelInfo, sheetInfo)
         paintbrushButton = LG.newImage("assets/icons/paintbrush.png")
     }
 
+    sheetInfo.zoomText = {}
+
     ---@class buttonOptions
     local barButtonStyle = {
         bg_color = COLOR.BUTTON_COLOR,
@@ -64,7 +66,7 @@ function m.createRoot(panelInfo, sheetInfo)
                                 DUI.newButton({dependencyIndex = 1,text = "Spritesheet", onClick = barButtonOnClick, defaultOn = true}, barButtonStyle),
                                 DUI.newButton({dependencyIndex = 2,text = "Sprites", onClick = barButtonOnClick}, barButtonStyle),
                                 DUI.newButton({dependencyIndex = 3,text = "Flags", onClick = barButtonOnClick}, barButtonStyle),
-                                DUI.newButton({dependencyIndex = 4,text = "Export", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 4,text = "Project", onClick = barButtonOnClick}, barButtonStyle),
                             }
                         }),
                         DUI.newVerticalContainer({ -- Panel 
@@ -84,7 +86,9 @@ function m.createRoot(panelInfo, sheetInfo)
                             children = {  -- Bottom bar buttons
                                 DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
                                 DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
-                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools)
+                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
+                                DUI.newButton({sizeFactor = 0.75}),
+                                DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
                         })
                     }

@@ -71,9 +71,11 @@ function m.init(sheetInfo, width, height)
             m.zoom = m.zoom + 0.1
         end
 
-        if y < 0 then
+        if y < 0 and m.zoom > 0.2 then
             m.zoom = m.zoom - 0.1
         end
+
+        sheetInfo.zoomText.setText("Zoom: "..m.zoom * 100 .."%")
     end
 
     function info.draw()

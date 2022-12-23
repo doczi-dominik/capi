@@ -8,6 +8,7 @@ lib.default_color = {1,1,1}
 lib.default_font = LG.getFont()
 lib.window_w,lib.window_h = LG.getDimensions()
 lib.current_focus = {}
+lib.locked_aspect_ratio = false
 
 --------------- BASECLASS ---------------
 
@@ -618,7 +619,11 @@ function lib.newMainContainer(options, style)
 
     function c.computeLayout()
         c.child.sizeFactor = 1
-        c.child.computeLayout(0,0,lib.window_w,lib.window_h)
+        if lib.locked_aspect_ratio then
+            c.child.computeLayout(0,0,lib.window_w * lib.getScale(),lib.window_h*lib.getScale())
+        else
+            c.child.computeLayout(0,0,lib.window_w,lib.window_h)
+        end
     end
 
     function c.mouseInput(x, y, button, type)
