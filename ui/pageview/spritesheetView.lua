@@ -3,45 +3,58 @@ local fileManager = require("file_manager")
 
 function m.createSpriteSheet(spriteInfo)
         
-    function m.newPalette(name,size)
-        local palette = {}
-
-        palette.name = name or ""
-        palette.size = size or ""
-
-        return palette
-    end
-
-    local paletteName = {}
-    local paletteSpriteSize = {}
-
-
     local function importFileData()
         spriteInfo.importedFileData = fileManager.fileDialogue()
     end
 
+    local paletteName = {}
+    local paletteSpriteSize = {}
+    paletteName.text = ""
+    paletteSpriteSize.text = ""
+
+    local function removePalette(button)
+        print(button.parent.debug_name)
+        local list = button.parent.parent
+        local name = button.parent.debug_name
+        for i = 1, #list.children do
+            if list.children[i].debug_name == name then
+                table.remove(list.children, i)
+                break
+            end
+        end
+
+        ROOT.computeLayout()
+    end
+
     local function createPalette()
-        spriteInfo.addItem(m.newPalette(paletteName.text,paletteSpriteSize.text))
+        if paletteName.text == "" or paletteSpriteSize.text == "" then
+            return
+        end
+        
+        spriteInfo.addChild(DUI.newHorizontalContainer({ 
+            debug_name = paletteName.text,
+            sizeFactor = 0.1,
+            margin = {3,3,3,2},
+            bg_color = COLOR.BUTTON_COLOR,
+            children = {
+                DUI.newText({sizeFactor = 0.83, text = paletteName.text}),
+                DUI.newButton({color = COLOR.WHITE,sprite = LG.newImage("assets/icons/trash.png"),onClick = removePalette, margin = {0,3,0,0}})
+            }
+        }))
+        ROOT.computeLayout()
+
         paletteName.text = ""
+        paletteSpriteSize.text = ""
+        paletteName.setText("")
+        paletteSpriteSize.setText("")
     end
-
-    function spriteInfo.draw(item,x,y,w,h)
-        LG.setColor(COLOR.BUTTON_COLOR)
-        LG.rectangle("fill",x + 4,y + 4,w - 8,h - 5)
-
-        LG.setColor(COLOR.BLACK)
-        LG.print(item.name,x,y)
-        LG.print(item.size,x,y + 10)
-    end
-
-   
 
     return { 
         DUI.newHorizontalContainer({
             sizeFactor = 0.07,
             children = {
                 DUI.newText({sizeFactor = 0.5,text = "Palette name:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName},STYLE.STYLEDTEXTINPUT)
+                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name"},STYLE.STYLEDTEXTINPUT)
 
             }
         }),   
@@ -49,18 +62,18 @@ function m.createSpriteSheet(spriteInfo)
             sizeFactor = 0.07,
             children = {
                 DUI.newText({sizeFactor = 0.65,text = "Sprite dimension:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize},STYLE.STYLEDTEXTINPUT)
+                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize, placeholder = "16"},STYLE.STYLEDTEXTINPUT)
 
             }
         }),
         DUI.newHorizontalContainer({
             sizeFactor = 0.09,
             children = {
-                DUI.newButton({sizeFactor = 0.5, margin = 2, text = "Import image", onClick = importFileData}, STYLE.STYLEDBUTTON),
-                DUI.newButton({sizeFactor = 0.5, margin = 2, text = "Create", onClick = createPalette}, STYLE.STYLEDBUTTON),
+                DUI.newButton({sizeFactor = 0.6, margin = 2, text = "Import image", onClick = importFileData}, STYLE.STYLEDBUTTON),
+                DUI.newButton({sizeFactor = 0.4, margin = 2, text = "Create", onClick = createPalette}, STYLE.STYLEDBUTTON),
             }
         }),  
-        DUI.newListContainer({bg_color = COLOR.PRIMARY, color = COLOR.WHITE, outVar = spriteInfo})    
+        DUI.newVerticalContainer({bg_color = COLOR.PRIMARY, outVar = spriteInfo})    
     }
 end
 

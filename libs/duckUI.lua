@@ -91,6 +91,11 @@ function lib.baseClass(options, style)
         end
     end
 
+    function c.outVar.addChild(child)
+        table.insert(c.children,child)
+        child.parent = c
+    end
+
     return c
 end
 --#endregion
@@ -256,6 +261,7 @@ end
 ---@field color {r:number,g:number,b:number,a:number} Primary color
 ---@field filter "any" | "number"
 ---@field alignmet "center" | "left" | "right"
+---@field placeholder string
 
 ---@param options? textInputOptions
 ---@param style? textInputOptions
@@ -271,6 +277,7 @@ function lib.newTextInput(options, style)
     c.max_characters = style.max_characters or options.max_characters or 20
     c.filter = style.filter or options.filter or "any"
     c.alignmet = style.alignmet or options.alignmet or "left"
+    c.placeholder = style.placeholder or options.placeholder or ""
 
     function c.getTextLength()
         local byteOffset = utf8.offset(c.text, -1)
@@ -302,7 +309,7 @@ function lib.newTextInput(options, style)
             LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
         end
 
-        if c.color ~= nil then
+        if c.color ~= nil and c.text ~= "" then
             LG.setColor(c.color)
             LG.setScissor(c.x + c.border_size,c.y + c.border_size,c.w -  c.border_size * 2,c.h -  c.border_size * 2)
             if c.alignmet == "left" then
@@ -311,9 +318,13 @@ function lib.newTextInput(options, style)
                 LG.print(c.text,c.x + c.w / 2 - lib.default_font:getWidth(c.text)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
             elseif c.alignmet == "right" then
                 LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
-            end
-            LG.setScissor()
+            end     
+        else
+            LG.setColor(0.6,0.6,0.6)
+            LG.print(c.placeholder,c.x + c.w / 2 - lib.default_font:getWidth(c.placeholder)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
         end
+
+        LG.setScissor()
     end
 
     function c.mouseInput(x,y,button, type)
@@ -475,13 +486,15 @@ function lib.newButton(options, style)
             LG.setColor(c.bg_color)
             LG.rectangle(c.fillMode,c.x + c.border_size,c.y + c.border_size,c.w - c.border_size * 2,c.h - c.border_size * 2)
         end
+
+        LG.setColor(c.color)
+
         if c.sprite ~= nil then
             LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / (c.sprite:getWidth() - c.border_size * 2), c.h / (c.sprite:getHeight()- c.border_size * 2))
         end
 
         
         ---- handle text -----
-        LG.setColor(c.color)
         
         if c.alignmet == "center" then
             LG.print(c.text,c.x + c.tw/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2,0,c.text_scale,c.text_scale)    
