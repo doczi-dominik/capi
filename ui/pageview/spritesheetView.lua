@@ -31,6 +31,12 @@ function m.createSpriteSheet(spriteInfo)
             return
         end
         
+        for i = 1, #spriteInfo.children do
+            if spriteInfo.children[i].debug_name == paletteName.text then
+                return
+            end
+        end
+
         spriteInfo.addChild(DUI.newHorizontalContainer({ 
             debug_name = paletteName.text,
             sizeFactor = 0.1,
@@ -54,7 +60,7 @@ function m.createSpriteSheet(spriteInfo)
             sizeFactor = 0.07,
             children = {
                 DUI.newText({sizeFactor = 0.5,text = "Palette name:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name"},STYLE.STYLEDTEXTINPUT)
+                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name", onEnter=createPalette},STYLE.STYLEDTEXTINPUT)
 
             }
         }),   
@@ -62,7 +68,7 @@ function m.createSpriteSheet(spriteInfo)
             sizeFactor = 0.07,
             children = {
                 DUI.newText({sizeFactor = 0.65,text = "Sprite dimension:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize, placeholder = "16"},STYLE.STYLEDTEXTINPUT)
+                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize, placeholder = "16", onEnter = createPalette},STYLE.STYLEDTEXTINPUT)
 
             }
         }),

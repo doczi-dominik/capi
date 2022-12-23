@@ -8,7 +8,8 @@ function m.createFlagView()
 
 
     return {
-        DUI.newButton({sizeFactor = 0.09, text = "Flag", onClick=export}, STYLE.STYLEDBUTTON)
+        DUI.newText({sizeFactor = 0.05, text = "Flags"}),
+        DUI.newListContainer({})
     }
 end
 

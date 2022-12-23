@@ -75,6 +75,7 @@ function lib.baseClass(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
+        c.outVar.children = c.children
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
     end
 
@@ -115,6 +116,7 @@ function lib.newVerticalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
+        c.outVar.children = c.children
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cy = c.y
         for i=1,#c.children do
@@ -214,6 +216,7 @@ function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
+        c.outVar.children = c.children
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cx = c.x
         for i=1,#c.children do
@@ -262,6 +265,7 @@ end
 ---@field filter "any" | "number"
 ---@field alignmet "center" | "left" | "right"
 ---@field placeholder string
+---@field onEnter function
 
 ---@param options? textInputOptions
 ---@param style? textInputOptions
@@ -278,6 +282,7 @@ function lib.newTextInput(options, style)
     c.filter = style.filter or options.filter or "any"
     c.alignmet = style.alignmet or options.alignmet or "left"
     c.placeholder = style.placeholder or options.placeholder or ""
+    c.onEnter = style.onEnter or options.onEnter
 
     function c.getTextLength()
         local byteOffset = utf8.offset(c.text, -1)
@@ -340,6 +345,9 @@ function lib.newTextInput(options, style)
     function c.keypressed(key, scancode, isrepeat)
         if key == "return" then
             lib.current_focus = {}
+            if c.onEnter ~= nil then
+                c.onEnter()
+            end
         elseif key == "backspace" then
             c.text = string.sub(c.text,1,c.getTextLength() - 1)
         end
