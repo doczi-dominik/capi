@@ -16,6 +16,7 @@ function m.createSprite(spriteInfo,spritePalette)
     end
 
     function spritePalette.draw(t)
+        LG.setColor(COLOR.PRIMARY)
         LG.rectangle("fill",t.x ,t.y,t.w,t.h)
     end
 

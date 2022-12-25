@@ -72,7 +72,7 @@ function m.createRoot(panelInfo, sheetInfo)
                         DUI.newVerticalContainer({ -- Panel 
                             bg_color = COLOR.BUTTON_HIGHLIGHT,
                             margin = 5,
-                            padding = {4,3,4,3},
+                            padding = {3,2,3,2},
                             outVar = panelInfo
                         })
                     }

@@ -13,7 +13,6 @@ function m.createSpriteSheet(spriteInfo)
     paletteSpriteSize.text = ""
 
     local function removePalette(button)
-        print(button.parent.debug_name)
         local list = button.parent.parent
         local name = button.parent.debug_name
         for i = 1, #list.children do
@@ -58,6 +57,7 @@ function m.createSpriteSheet(spriteInfo)
     return { 
         DUI.newHorizontalContainer({
             sizeFactor = 0.07,
+            padding = 2,
             children = {
                 DUI.newText({sizeFactor = 0.5,text = "Palette name:", alignmet = "left"}),
                 DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name", onEnter=createPalette},STYLE.STYLEDTEXTINPUT)
@@ -66,6 +66,7 @@ function m.createSpriteSheet(spriteInfo)
         }),   
         DUI.newHorizontalContainer({
             sizeFactor = 0.07,
+            padding = 2,
             children = {
                 DUI.newText({sizeFactor = 0.65,text = "Sprite dimension:", alignmet = "left"}),
                 DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize, placeholder = "16", onEnter = createPalette},STYLE.STYLEDTEXTINPUT)
@@ -73,7 +74,7 @@ function m.createSpriteSheet(spriteInfo)
             }
         }),
         DUI.newHorizontalContainer({
-            sizeFactor = 0.09,
+            sizeFactor = 0.08,
             children = {
                 DUI.newButton({sizeFactor = 0.6, margin = 2, text = "Import image", onClick = importFileData}, STYLE.STYLEDBUTTON),
                 DUI.newButton({sizeFactor = 0.4, margin = 2, text = "Create", onClick = createPalette}, STYLE.STYLEDBUTTON),
