@@ -16,6 +16,11 @@ function m.fileDialogue()
     local output = fileHandle:read("*a")
     local path = string.sub(output, 2, #output - 1)
 
+    return m.readFile(path)
+end
+
+---@return love.FileData?
+function m.readFile(path)
     local f = io.open(path, "rb")
 
     if f == nil then

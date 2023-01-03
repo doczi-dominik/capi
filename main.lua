@@ -26,8 +26,18 @@ local flagInfo = {}
 ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
 
+local spriteCollection = require("data.sprite_collection")(16)
+
+spriteCollection.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
+
+local cellCollection = require("data.cell_collection")(8, 8)
+
 SHEET = require("sheet.sheet")
-SHEET.init(sheetInfo, 8, 8)
+SHEET.init({
+    info = sheetInfo,
+    sprites = spriteCollection,
+    cells = cellCollection
+})
 
 PAGES = {
     require("ui.pageview.spritesheetView").createSpriteSheet(spriteInfo),
