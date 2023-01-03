@@ -136,7 +136,7 @@ function m.init(opts)
             m.zoom = m.zoom - 0.1
         end
 
-        sheetInfo.zoomText.setText("Zoom: "..m.zoom * 100 .."%")
+        info.zoomText.setText("Zoom: "..m.zoom * 100 .."%")
     end
 
     function info.draw()
