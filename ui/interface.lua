@@ -1,11 +1,19 @@
-
 local m = {}
 
 function m.createRoot(panelInfo, sheetInfo)
+    local icons = {
+        gridButton = LG.newImage("assets/icons/grid.png"),
+        moveButton = LG.newImage("assets/icons/move.png"),
+        paintbrushButton = LG.newImage("assets/icons/paintbrush.png")
+    }
+
+    sheetInfo.zoomText = {}
+
+    ---@class buttonOptions
     local barButtonStyle = {
         bg_color = COLOR.BUTTON_COLOR,
         highlight_color = COLOR.BUTTON_HIGHLIGHT,
-        sizeFactor = 1/3,
+        sizeFactor = 1/4,
         alignmet = "+90",
         color = COLOR.BLACK,
 
@@ -13,9 +21,25 @@ function m.createRoot(panelInfo, sheetInfo)
 
         drawExt = function (self)
             if self.isOn then
-                self.w = self.tw + self.parent.padding * 2
+                self.w = self.tw + self.parent.padding[3] * 2+ self.parent.margin[3] * 2
             end
         end,
+    }
+
+    ---@class buttonOptions
+    local bottomBarButtonStyle = {
+        bg_color = COLOR.BUTTON_COLOR,
+        highlight_color = COLOR.BUTTON_HIGHLIGHT,
+        sizeFactor = 0.04,
+        margin = 3,
+    }
+
+    local tools = {
+        bg_color = COLOR.BUTTON_COLOR,
+        highlight_color = COLOR.BUTTON_HIGHLIGHT,
+        sizeFactor = 0.04,
+        margin = 3,
+        dependencyTable = {}
     }
 
     local barButtonOnClick = function(b)
@@ -23,32 +47,52 @@ function m.createRoot(panelInfo, sheetInfo)
         ROOT.computeLayout()
     end
 
-    return DUI.newMainContainer({
+    local toggleGrid = function ()
+        SHEET.showGrid = not SHEET.showGrid
+    end
+
+    return DUI.newMainContainer({ -- Main Window
         child = DUI.newHorizontalContainer({
             children = {
-                DUI.newHorizontalContainer({ -- sidebar container
-                    sizeFactor = 0.3,
+                DUI.newHorizontalContainer({ -- Side panel
+                    sizeFactor = 0.28,
                     bg_color = COLOR.PRIMARY,
                     children = {
-                        DUI.newVerticalContainer({-- actionbar
-                            sizeFactor = 0.13,
-                            padding = 5,
+                        DUI.newVerticalContainer({ -- Actionbar
+                            sizeFactor = 0.11,
+                            margin = 3,
+                            padding = {2,2,0,2},
                             children = {
-                                DUI.newButton({dependencyIndex = 1,text = "draw", onClick = barButtonOnClick, defaultOn = true}, barButtonStyle),
-                                DUI.newButton({dependencyIndex = 2,text = "spritesheet", onClick = barButtonOnClick}, barButtonStyle),
-                                DUI.newButton({dependencyIndex = 3,text = "spritesheet", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 1,text = "Spritesheet", onClick = barButtonOnClick, defaultOn = true}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 2,text = "Sprites", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 3,text = "Flags", onClick = barButtonOnClick}, barButtonStyle),
+                                DUI.newButton({dependencyIndex = 4,text = "Project", onClick = barButtonOnClick}, barButtonStyle),
                             }
                         }),
-                        DUI.newVerticalContainer({
+                        DUI.newVerticalContainer({ -- Panel 
                             bg_color = COLOR.BUTTON_HIGHLIGHT,
                             margin = 5,
-                            debug_name = "mukodj",
-                            padding = 6,
+                            padding = {4,3,4,3},
                             outVar = panelInfo
                         })
                     }
                 }),
-                DUI.newContainer({outVar = sheetInfo})
+                DUI.newVerticalContainer({ -- Editor winow
+                    children = {
+                        DUI.newContainer({outVar = sheetInfo, sizeFactor = 0.948}),
+                        DUI.newHorizontalContainer({
+                            bg_color = COLOR.PRIMARY,
+                            padding = {0,1,0,1},
+                            children = {  -- Bottom bar buttons
+                                DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
+                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
+                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
+                                DUI.newButton({sizeFactor = 0.75}),
+                                DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
+                            }
+                        })
+                    }
+                }) 
             }
         })})
 end

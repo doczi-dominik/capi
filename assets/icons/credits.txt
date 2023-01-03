@@ -1,0 +1,4 @@
+Grid.png - https://www.flaticon.com/free-icon/grid_8095891?term=grid&page=1&position=53&origin=search&related_id=8095891
+move.png - https://www.flaticon.com/free-icon/move_636647?term=move&page=1&position=24&origin=search&related_id=636647
+paintbrush.png - https://www.flaticon.com/free-icon/paintbrush_129817?term=brush&page=1&position=2&origin=search&related_id=129817
+trash.png - https://www.flaticon.com/free-icon/trash_3096673?term=trash&related_id=3096673

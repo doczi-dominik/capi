@@ -19,6 +19,9 @@ require("ui.style")
 
 local sheetInfo = {}
 local panelInfo =  {}
+local spriteInfo = {}
+local spritePalette = {}
+local flagInfo = {}
 
 ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
 ROOT.computeLayout()
@@ -37,12 +40,19 @@ SHEET.init({
 })
 
 PAGES = {
-    require("ui.pageview.spritesheetView"),
-    require("ui.pageview.nemtom"),
-    require("ui.pageview.exportView")
+    require("ui.pageview.spritesheetView").createSpriteSheet(spriteInfo),
+    require("ui.pageview.spritesView").createSprite(spriteInfo,spritePalette),
+    require("ui.pageview.flagView").createFlagView(flagInfo),
+    require("ui.pageview.projectView").createExportView()
 }
 
 panelInfo.setChild(PAGES[1])
+
+--#region
+
+function love.load()
+    DUI.load()
+end
 
 function love.resize(w, h)
     WINDOW_W, WINDOW_H = w, h
@@ -74,5 +84,15 @@ end
 function love.draw()
     ROOT.draw()
 end
+
+function love.keypressed(key, scancode, isrepeat)
+    DUI.keypressed(key, scancode, isrepeat)
+end
+
+function love.textinput(t)
+    DUI.textinput(t)
+end
+
+--#endregion
 
 love.resize(LG.getDimensions())
