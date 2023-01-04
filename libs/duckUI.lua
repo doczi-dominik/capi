@@ -35,8 +35,8 @@ function lib.baseClass(options, style)
     c.parent = c.parent or {}   ---@type table
     c.outVar = options.outVar or {} ---@type table
     c.padding = style.padding or options.padding or 0   ---@type number | {left: number,up: number,right: number,down: number}
-    c.bg_color = style.bg_color or options.bg_color ---@type table 
-    c.fillMode = style.fillMode or options.fillMode or "fill" ---@alias modes "fill" | "line" 
+    c.bg_color = style.bg_color or options.bg_color ---@type table
+    c.fillMode = style.fillMode or options.fillMode or "fill" ---@alias modes "fill" | "line"
     c.sizeFactor = style.sizeFactor or options.sizeFactor or 1  ---@type number 0 > 1 | 0% > 100% Percentage of element size
     c.margin = style.margin or options.margin or 0  ---@type number | {left: number,up: number,right: number,down: number}
 
@@ -121,7 +121,7 @@ function lib.newVerticalContainer(options, style)
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cy = c.y
         for i=1,#c.children do
-            local ch = c.h * c.children[i].sizeFactor           
+            local ch = c.h * c.children[i].sizeFactor
             c.children[i].computeLayout(c.x + c.padding[1], cy + c.padding[2] ,c.w - c.padding[3] * 2,math.min(ch, c.h-cy + c.y) - c.padding[4] * 2)
 
             cy = cy + ch
@@ -136,7 +136,7 @@ function lib.newVerticalContainer(options, style)
         local lastcy = 0
         local ccy = c.y
         for i = 1, #c.children do
-            
+
             ccy = ccy + (c.children[i].sizeFactor * c.h) + c.padding[2]
             if cy < ccy and cy > lastcy then
                 c.children[i].mouseInput( x, y, button, type)
@@ -157,7 +157,7 @@ end
 
 ---@class TextOptions : baseClassOptions
 ---@field text string Text to display
----@field alignmet "center" | "+90" | "left" | "rigth"
+---@field alignmet love.AlignMode | "+90"
 ---@field color {r:number,g:number,b:number,a:number} Primary color
 
 
@@ -179,19 +179,19 @@ function lib.newText(options, style)
 
     function c:draw()
         LG.setColor(c.color)
-        
-        if c.alignmet == "center" then
-            LG.print(c.text,c.x + c.w/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2)    
-        elseif c.alignmet == "+90" then
+
+        if c.alignmet == "+90" then
             LG.print(c.text,
             c.x + c.tw/2 - FONT:getHeight()/1.7,
             c.y + c.h/2 + FONT:getWidth(c.text)/2,
             -math.pi/2,
             1,1)
-        elseif c.alignmet == "left" then
-                LG.print(c.text,c.x + c.padding[1],c.y + c.h / 2 - lib.default_font:getHeight()/2)
-        elseif c.alignmet == "right" then
-            LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
+        else
+            local _, lines = lib.default_font:getWrap(c.text, c.w)
+            local y = c.y + c.h/2 - (lib.default_font:getHeight() * #lines)/2
+
+            ---@diagnostic disable-next-line: param-type-mismatch
+            LG.printf(c.text, c.x, y, c.w, c.alignmet)
         end
     end
 
@@ -260,7 +260,7 @@ end
 ---@field text string Text to display
 ---@field bar_width number
 ---@field max_characters number
----@field border_color {r:number,g:number,b:number,a:number} 
+---@field border_color {r:number,g:number,b:number,a:number}
 ---@field border_size number
 ---@field color {r:number,g:number,b:number,a:number} Primary color
 ---@field filter "any" | "number"
@@ -324,7 +324,7 @@ function lib.newTextInput(options, style)
                 LG.print(c.text,c.x + c.w / 2 - lib.default_font:getWidth(c.text)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
             elseif c.alignmet == "right" then
                 LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
-            end     
+            end
         else
             LG.setColor(0.6,0.6,0.6)
             LG.print(c.placeholder,c.x + c.w / 2 - lib.default_font:getWidth(c.placeholder)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
@@ -415,7 +415,7 @@ end
 ---@field onClick function Function to call when a button is pressed
 ---@field drawExt function Settable draw function that gets called before any other draw in the component
 ---@field highlight_color {r:number,g:number,b:number,a:number} The color that is set on an active button
----@field border_color {r:number,g:number,b:number,a:number} 
+---@field border_color {r:number,g:number,b:number,a:number}
 ---@field border_size number
 ---@field toggleable boolean Sets the button to a toggle switch
 ---@field dependencyTable table
@@ -435,7 +435,7 @@ function lib.newButton(options, style)
     c.onClick = style.onClick or options.onClick or function () end
     c.drawExt = style.drawExt or options.drawExt
     c.color = style.color or options.color or {0,0,0}
-    c.highlight_color = style.highlight_color or options.highlight_color 
+    c.highlight_color = style.highlight_color or options.highlight_color
     c.border_color = style.border_color or options.border_color
     c.border_size = style.border_size or options.border_size or 0
     c.text = options.text or ""
@@ -474,7 +474,7 @@ function lib.newButton(options, style)
             c.isOn = true
             c:onClick()
         elseif c.onClick ~= nil then
-            c:onClick() 
+            c:onClick()
         end
     end
 
@@ -502,18 +502,22 @@ function lib.newButton(options, style)
             LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / (c.sprite:getWidth() - c.border_size * 2), c.h / (c.sprite:getHeight()- c.border_size * 2))
         end
 
-        
+
         ---- handle text -----
-        
-        if c.alignmet == "center" then
-            LG.print(c.text,c.x + c.tw/2 - lib.default_font:getWidth(c.text)/2,c.y + c.h/2 - lib.default_font:getHeight()/2,0,c.text_scale,c.text_scale)    
-        elseif c.alignmet == "+90" then
+
+        if c.alignmet == "+90" then
             LG.print(c.text,
             c.x + c.tw/2 - FONT:getHeight()/1.7,
             c.y + c.h/2 + FONT:getWidth(c.text)/2,
             -math.pi/2,
             1,1)
-        end     
+        else
+            local _, lines = lib.default_font:getWrap(c.text, c.w)
+            local y = c.y + c.h/2 - (lib.default_font:getHeight() * #lines)/2
+
+            ---@diagnostic disable-next-line: param-type-mismatch
+            LG.printf(c.text, c.x, y, c.w, c.alignmet)
+        end
     end
 
     return c
@@ -563,9 +567,9 @@ function lib.newListContainer(options, style)
             end
         end
         LG.setScissor()
-    end 
+    end
 
-    
+
 
     return c
 end
@@ -632,7 +636,7 @@ function lib.newMainContainer(options, style)
         end
         c.child.mouseInput(x, y, button, type)
     end
-    
+
     function c.mousepressed()
         lib.current_focus = {}
     end
