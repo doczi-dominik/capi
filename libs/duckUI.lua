@@ -499,7 +499,17 @@ function lib.newButton(options, style)
         LG.setColor(c.color)
 
         if c.sprite ~= nil then
-            LG.draw(c.sprite,c.x + c.border_size,c.y + c.border_size,0,c.w / (c.sprite:getWidth() - c.border_size * 2), c.h / (c.sprite:getHeight()- c.border_size * 2))
+            local sw = c.sprite:getWidth() - c.border_size * 2
+            local sh = c.sprite:getHeight() - c.border_size * 2
+
+            local scaleX = c.w / sw
+            local scaleY = c.h / sh
+
+            local scale = math.min(scaleX, scaleY)
+            local w = sw * scale
+            local h = sh * scale
+
+            LG.draw(c.sprite,c.x + (c.w - w)/2,c.y + (c.h - h)/2, 0, scale, scale)
         end
 
 

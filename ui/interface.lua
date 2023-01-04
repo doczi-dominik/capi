@@ -26,7 +26,7 @@ function m.createRoot(panelInfo, sheetInfo)
         end,
     }
 
-    ---@class buttonOptions
+    ---@type buttonOptions
     local bottomBarButtonStyle = {
         bg_color = COLOR.BUTTON_COLOR,
         highlight_color = COLOR.BUTTON_HIGHLIGHT,
