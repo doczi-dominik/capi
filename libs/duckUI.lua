@@ -634,7 +634,9 @@ function lib.newMainContainer(options, style)
     function c.computeLayout()
         c.child.sizeFactor = 1
         if lib.locked_aspect_ratio then
-            c.child.computeLayout(0,0,lib.window_w * lib.getScale(),lib.window_h*lib.getScale())
+            local w = math.min(lib.default_res[1] / lib.default_res[2] * lib.window_h,lib.window_w)
+            local h = math.min(lib.default_res[2] / lib.default_res[1] * lib.window_w,lib.window_h)
+            c.child.computeLayout((lib.window_w - w) / 2,0,w,h)
         else
             c.child.computeLayout(0,0,lib.window_w,lib.window_h)
         end
