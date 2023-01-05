@@ -22,8 +22,9 @@ local panelInfo =  {}
 local spriteInfo = {}
 local spritePalette = {}
 local flagInfo = {}
+local toolMediator = require("data.tool_mediator")
 
-ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
+ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo, toolMediator)
 ROOT.computeLayout()
 
 local spriteCollection = require("data.sprite_collection")(16)
@@ -36,7 +37,8 @@ SHEET = require("sheet.sheet")
 SHEET.init({
     info = sheetInfo,
     sprites = spriteCollection,
-    cells = cellCollection
+    cells = cellCollection,
+    toolMediator = toolMediator
 })
 
 PAGES = {

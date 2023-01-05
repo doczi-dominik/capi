@@ -5,6 +5,8 @@ local DESIGN_PADDING = 24
 local info  ---@type table
 local sprites  ---@type spriteCollection
 local cells  ---@type cellCollection
+local toolMediator ---@type toolMediator
+
 local canvas  ---@type love.Canvas
 local w, h  ---@type integer, integer
 local cursorX, cursorY = love.mouse.getPosition()
@@ -13,35 +15,9 @@ local offsetX, offsetY = 0, 0
 local dragStartX, dragStartY  ---@type number|nil, number|nil
 local dragStartOffsetX ---@type number
 local dragStartOffsetY  ---@type number
-local dragEnabled = false
 
-local function updateDrag()
-    if dragStartX == nil or dragStartY == nil then
-        return
-    end
-
-    local dx = dragStartX - cursorX
-    local dy = dragStartY - cursorY
-    local dist = (dx ^ 2 + dy ^ 2) ^ 0.5
-
-    if dist > 15 then
-        dragEnabled = true
-    end
-
-    if dragEnabled then
-        offsetX = dragStartOffsetX + cursorX - dragStartX
-        offsetY = dragStartOffsetY + cursorY - dragStartY
-    end
-end
-
-local function getPosition()
-    local padding = DESIGN_PADDING * SCALE
-
-    local x = info.x + padding + offsetX
-    local y = padding + offsetY
-
-    return x, y
-end
+local drawEnabled = false
+local eraseEnabled = false
 
 m.zoom = 1
 m.showGrid = true
@@ -50,15 +26,39 @@ m.showGrid = true
 ---@field info table info table used by `duckUI` to maintain layout information
 ---@field sprites spriteCollection reference to the main spriteCollection
 ---@field cells cellCollection reference to the main cellCollection
+---@field toolMediator toolMediator reference to the main toolMediator
 
 ---@param opts sheetInitOptions
 function m.init(opts)
     info = opts.info
     sprites = opts.sprites
     cells = opts.cells
+    toolMediator = opts.toolMediator
 
     local cellW = cells.width
     local cellH = cells.height
+
+    local function createLayerFilter()
+        local f = {}
+
+        for y = 1, cellH do
+            f[y] = {}
+            for x = 1, cellW do
+                f[y][x] = false
+            end
+        end
+
+        return f
+    end
+
+    local function getPosition()
+        local padding = DESIGN_PADDING * SCALE
+
+        local x = info.x + padding + offsetX
+        local y = padding + offsetY
+
+        return x, y
+    end
 
     local function screenToCell(screenX, screenY)
         local baseX, baseY = getPosition()
@@ -73,32 +73,105 @@ function m.init(opts)
         return cellX, cellY, isXValid and isYValid
     end
 
-    local function onLeftClick(x, y)
+    local function updateDrag(x, y)
+        if dragStartX == nil or dragStartY == nil then
+            return
+        end
+
+        offsetX = dragStartOffsetX + x - dragStartX
+        offsetY = dragStartOffsetY + y - dragStartY
+    end
+
+    local drawFilter
+    local eraseFilter
+
+    local function updateDraw(x, y)
+        if not drawEnabled then
+            return
+        end
+
+        local cellX, cellY, isValid = screenToCell(x, y)
+
+        if isValid and not drawFilter[cellY][cellX] then
+            local cell = cells.data[cellY][cellX].sprites
+
+            cell[#cell+1] = sprites.selectedIndex
+            drawFilter[cellY][cellX] = true
+        end
+    end
+
+    local function updateErase(x, y)
+        if not eraseEnabled then
+            return
+        end
+
+        local cellX, cellY, isValid = screenToCell(x, y)
+
+        if isValid and not eraseFilter[cellY][cellX] then
+            local cell = cells.data[cellY][cellX].sprites
+
+            table.remove(cell, #cell)
+            eraseFilter[cellY][cellX] = true
+        end
+    end
+
+    local function onMoveLeftClick(x, y)
         dragStartX, dragStartY = x, y
         dragStartOffsetX = offsetX
         dragStartOffsetY = offsetY
     end
 
-    local function onRightRelease(x, y)
-        local cellX, cellY, isValid = screenToCell(x, y)
+    local function onPaintbrushLeftClick(x, y)
+        drawEnabled = true
+        eraseEnabled = false
 
-        if isValid then
-            local cell = cells.data[cellY][cellX].sprites
+        drawFilter = createLayerFilter()
+    end
 
-            table.remove(cell, #cell)
+    local function onMoveLeftRelease(x, y)
+        dragStartX, dragStartY = nil, nil
+    end
+
+    local function onPaintbrushLeftRelease(x, y)
+        drawEnabled = false
+    end
+
+    local function onPaintbrushRightClick(x, y)
+        eraseEnabled = true
+        drawEnabled = false
+
+        eraseFilter = createLayerFilter()
+    end
+
+    local function onPaintbrushRightRelease(x, y)
+        eraseEnabled = false
+    end
+
+    local function onLeftClick(x, y)
+        if toolMediator.selectedTool == "move" then
+            onMoveLeftClick(x, y)
+        elseif toolMediator.selectedTool == "paintbrush" then
+            onPaintbrushLeftClick(x, y)
         end
     end
 
     local function onLeftRelease(x, y)
-        dragStartX, dragStartY = nil, nil
-        dragEnabled = false
+        if toolMediator.selectedTool == "move" then
+            onMoveLeftRelease(x, y)
+        elseif toolMediator.selectedTool == "paintbrush" then
+            onPaintbrushLeftRelease(x, y)
+        end
+    end
 
-        local cellX, cellY, isValid = screenToCell(x, y)
+    local function onRightClick(x, y)
+        if toolMediator.selectedTool == "paintbrush" then
+            onPaintbrushRightClick(x, y)
+        end
+    end
 
-        if isValid then
-            local cell = cells.data[cellY][cellX].sprites
-
-            cell[#cell+1] = sprites.selectedIndex
+    local function onRightRelease(x, y)
+        if toolMediator.selectedTool == "paintbrush" then
+            onPaintbrushRightRelease(x, y)
         end
     end
 
@@ -110,6 +183,8 @@ function m.init(opts)
     function info.mousepressed(x, y, button)
         if button == 1 then
             onLeftClick(x, y)
+        elseif button == 2 then
+            onRightClick(x, y)
         end
     end
 
@@ -124,7 +199,9 @@ function m.init(opts)
     function info.mousemoved(x, y)
         cursorX, cursorY = x, y
 
-        updateDrag()
+        updateDrag(x, y)
+        updateDraw(x, y)
+        updateErase(x, y)
     end
 
     function info.wheelmoved(x, y)

@@ -1,6 +1,6 @@
 local m = {}
 
-function m.createRoot(panelInfo, sheetInfo)
+function m.createRoot(panelInfo, sheetInfo, toolMediator)
     local icons = {
         gridButton = LG.newImage("assets/icons/grid.png"),
         moveButton = LG.newImage("assets/icons/move.png"),
@@ -47,7 +47,7 @@ function m.createRoot(panelInfo, sheetInfo)
         ROOT.computeLayout()
     end
 
-    local toggleGrid = function ()
+    local toggleGrid = function()
         SHEET.showGrid = not SHEET.showGrid
     end
 
@@ -85,8 +85,8 @@ function m.createRoot(panelInfo, sheetInfo)
                             padding = {0,1,0,1},
                             children = {  -- Bottom bar buttons
                                 DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
-                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
-                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
+                                DUI.newButton({sprite = icons.moveButton, onClick = function() toolMediator.selectedTool = "move" end, defaultOn = true, dependencyIndex = 1}, tools),
+                                DUI.newButton({sprite = icons.paintbrushButton, onClick = function() toolMediator.selectedTool = "paintbrush" end, dependencyIndex = 2}, tools),
                                 DUI.newButton({sizeFactor = 0.75}),
                                 DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
