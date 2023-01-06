@@ -1,7 +1,7 @@
 local m = {}
 
 
-function m.createSprite(spriteInfo,spritePalette)
+function m.createSprite(root,spriteInfo,spritePalette)
     local spriteSelectText = {}
     spriteInfo.selectionSize = 1
     

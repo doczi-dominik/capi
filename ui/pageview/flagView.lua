@@ -1,6 +1,6 @@
 local m = {}
 
-function m.createFlagView(flagInfo)
+function m.createFlagView(root,flagInfo)
 
     flagInfo.flagName = {}
 

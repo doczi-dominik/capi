@@ -1,21 +1,36 @@
 ---@diagnostic disable: duplicate-set-field
 
-LG = love.graphics
-LG.setDefaultFilter("nearest","nearest")
+------- GLOBALS ------
 
+--#region
 DESIGN_W, DESIGN_H = 1280, 720
 WINDOW_W, WINDOW_H = 0, 0
 SCALE = 0
 
-FONT = LG.newFont("assets/font/monogram-extended.ttf", 28)
+FONT = love.graphics.newFont("assets/font/monogram-extended.ttf", 28)
 FONT_HEIGHT = FONT:getHeight()
-LG.setFont(FONT)
+--#endregion
 
--- LIBRARY SETUP
+
+-------- LOVE CONFIG -------
+
+--#region
+LG = love.graphics
+LG.setDefaultFilter("nearest","nearest")
+
+LG.setFont(FONT)
+--#endregion
+
+
+------ LIBRARY SETUP ---------
+
+--#region
 DUI = require("libs.duckUI")
 DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 require("ui.colors")
 require("ui.style")
+--#endregion
+
 
 local sheetInfo = {}
 local panelInfo =  {}
@@ -23,8 +38,29 @@ local spriteInfo = {}
 local spritePalette = {}
 local flagInfo = {}
 
-ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo)
-ROOT.computeLayout()
+-- Set up multiple windows
+local WINDOWS = {
+    EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo),
+    ENTRY = {},
+}
+
+-- Set the current window to the project select screen
+local current_window = WINDOWS.EDITOR
+
+for i = 1, #WINDOWS do
+    WINDOWS[i].computeLayout()
+end
+
+-- Set up multiple sidebar pages
+PAGES = {
+    require("ui.pageview.spritesheetView").createSpriteSheet(WINDOWS.EDITOR,spriteInfo),
+    require("ui.pageview.spritesView").createSprite(WINDOWS.EDITOR,spriteInfo,spritePalette),
+    require("ui.pageview.flagView").createFlagView(WINDOWS.EDITOR,flagInfo),
+    require("ui.pageview.projectView").createExportView(WINDOWS.EDITOR)
+}
+
+-- Default page when the program starts
+panelInfo.setChild(PAGES[1])
 
 local spriteCollection = require("data.sprite_collection")(16)
 
@@ -39,16 +75,9 @@ SHEET.init({
     cells = cellCollection
 })
 
-PAGES = {
-    require("ui.pageview.spritesheetView").createSpriteSheet(spriteInfo),
-    require("ui.pageview.spritesView").createSprite(spriteInfo,spritePalette),
-    require("ui.pageview.flagView").createFlagView(flagInfo),
-    require("ui.pageview.projectView").createExportView()
-}
 
-panelInfo.setChild(PAGES[1])
 
---#region
+--#region- LOVE FUNCTIONS
 
 function love.load()
     DUI.load()
@@ -59,30 +88,30 @@ function love.resize(w, h)
     SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
 
     DUI.resize(w,h)
-    ROOT.computeLayout()
+    current_window.computeLayout()
 end
 
 function love.mousepressed(x, y, button)
-    ROOT.mouseInput(x, y, button, "mousepressed")
+    current_window.mouseInput(x, y, button, "mousepressed")
 end
 
 function love.mousereleased(x, y, button)
-    ROOT.mouseInput(x, y, button, "mousereleased")
+    current_window.mouseInput(x, y, button, "mousereleased")
 end
 
 function love.mousemoved(x, y)
-    ROOT.mouseInput(x, y, nil, "mousemoved")
+    current_window.mouseInput(x, y, nil, "mousemoved")
 end
 
 function love.wheelmoved(x, y)
-    ROOT.mouseInput(x, y, nil, "wheelmoved")
+    current_window.mouseInput(x, y, nil, "wheelmoved")
 end
 
 function love.update(dt)
 end
 
 function love.draw()
-    ROOT.draw()
+    current_window.draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)

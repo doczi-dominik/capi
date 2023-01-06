@@ -1,7 +1,7 @@
 local m = {}
 local fileManager = require("file_manager")
 
-function m.createSpriteSheet(spriteInfo)
+function m.createSpriteSheet(root,spriteInfo)
         
     local function importFileData()
         spriteInfo.importedFileData = fileManager.fileDialogue()
@@ -22,7 +22,7 @@ function m.createSpriteSheet(spriteInfo)
             end
         end
 
-        ROOT.computeLayout()
+        root.computeLayout()
     end
 
     local function createPalette()
@@ -46,7 +46,7 @@ function m.createSpriteSheet(spriteInfo)
                 DUI.newButton({color = COLOR.WHITE,sprite = LG.newImage("assets/icons/trash.png"),onClick = removePalette, margin = {0,3,0,0}})
             }
         }))
-        ROOT.computeLayout()
+        root.computeLayout()
 
         paletteName.text = ""
         paletteSpriteSize.text = ""

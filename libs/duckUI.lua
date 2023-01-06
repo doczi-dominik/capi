@@ -118,6 +118,7 @@ function lib.newVerticalContainer(options, style)
 
     function c.computeLayout(x,y,w,h)
         c.outVar.children = c.children
+        c.outVar.parent = c.parent
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
         local cy = c.y
         for i=1,#c.children do

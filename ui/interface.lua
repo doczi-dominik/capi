@@ -44,14 +44,16 @@ function m.createRoot(panelInfo, sheetInfo)
 
     local barButtonOnClick = function(b)
         panelInfo.setChild(PAGES[b.dependencyIndex])
-        ROOT.computeLayout()
+        local p = panelInfo.parent
+        p.computeLayout(p.x - p.margin[1],p.y - p.margin[2],p.w + p.margin[3] * 2,p.h + p.margin[4] * 2)
+        
     end
 
     local toggleGrid = function ()
         SHEET.showGrid = not SHEET.showGrid
     end
 
-    return DUI.newMainContainer({ -- Main Window
+    local root = DUI.newMainContainer({ -- Main Window
         child = DUI.newHorizontalContainer({
             children = {
                 DUI.newHorizontalContainer({ -- Side panel
@@ -95,6 +97,8 @@ function m.createRoot(panelInfo, sheetInfo)
                 }) 
             }
         })})
+
+        return root
 end
 
 return m
