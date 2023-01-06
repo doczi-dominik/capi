@@ -40,6 +40,9 @@ function lib.baseClass(options, style)
     c.sizeFactor = style.sizeFactor or options.sizeFactor or 1  ---@type number 0 > 1 | 0% > 100% Percentage of element size
     c.margin = style.margin or options.margin or 0  ---@type number | {left: number,up: number,right: number,down: number}
 
+    --- If the user gives a single number as padding or margin, set all side dependent margin and padding to the input
+    ---@param t number | {left: number,up: number,right: number,down: number}
+    ---@return table 
     local function handleNumberInput(t)
         local temp = t
         t = {}
@@ -49,7 +52,7 @@ function lib.baseClass(options, style)
 
         return t
     end
-
+    
     if type(c.padding) == "number" then
         c.padding = handleNumberInput(c.padding)
     end
@@ -75,9 +78,20 @@ function lib.baseClass(options, style)
         end
     end
 
-    function c.computeLayout(x,y,w,h)
+    ---comment
+    ---@param x number
+    ---@param y number
+    ---@param w number
+    ---@param h number
+    ---@param f? function # Specify object specific calculations
+    function c.priv_computeLayout(x,y,w,h,f)
         c.outVar.children = c.children
+        c.outVar.parent = c.parent
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
+        c.outVar.x,c.outVar.y,c.outVar.w,c.outVar.h = c.x,c.y,c.w,c.h
+
+        f = f or function () end
+        f()
     end
 
     function c.mouseInput( x, y, button, type)
@@ -117,33 +131,33 @@ function lib.newVerticalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.outVar.children = c.children
-        c.outVar.parent = c.parent
-        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
+        c.priv_computeLayout(x,y,w,h,
+        function ()
         local cy = c.y
-        for i=1,#c.children do
-            local ch = c.h * c.children[i].sizeFactor
-            c.children[i].computeLayout(c.x + c.padding[1], cy + c.padding[2] ,c.w - c.padding[3] * 2,math.min(ch, c.h-cy + c.y) - c.padding[4] * 2)
+            for i=1,#c.children do
+                local ch = c.h * c.children[i].sizeFactor
+                c.children[i].computeLayout(c.x + c.padding[1], cy + c.padding[2] ,c.w - c.padding[3] * 2,math.min(ch, c.h-cy + c.y) - c.padding[4] * 2)
 
-            cy = cy + ch
+                cy = cy + ch
+            end
         end
+        )
     end
 
     function c.mouseInput( x, y, button, type)
-        local cx,cy = x,y
-        if type == "wheelmoved" then
+        local cx,cy = x,y 
+        if type == "wheelmoved" then -- We dont get mouse position, only wheel movemenet
             cx,cy = love.mouse.getPosition()
         end
-        local lastcy = 0
-        local ccy = c.y
+        local endPos = 0
+        local startPos = c.y
         for i = 1, #c.children do
-
-            ccy = ccy + (c.children[i].sizeFactor * c.h) + c.padding[2]
-            if cy < ccy and cy > lastcy then
+            startPos = startPos + (c.children[i].sizeFactor * c.h) + c.padding[2]
+            if cy < startPos and cy > endPos then
                 c.children[i].mouseInput( x, y, button, type)
                 break
             end
-            lastcy = ccy
+            endPos = startPos
         end
     end
 
@@ -174,7 +188,7 @@ function lib.newText(options, style)
     c.tw = 0
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
+        c.priv_computeLayout(x,y,w,h)
         c.tw = w
     end
 
@@ -218,32 +232,35 @@ function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.outVar.children = c.children
-        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
-        local cx = c.x
-        for i=1,#c.children do
-            local cw = c.w * c.children[i].sizeFactor
-            c.children[i].computeLayout(
-                cx + c.padding[1],
-                y + c.padding[2],
-                math.min(cw,c.w - cx + c.x) - c.padding[3] * 2,
-                c.h - c.padding[4] * 2)
-            cx = cx + cw
-        end
+        c.priv_computeLayout(x,y,w,h,
+        function ()        
+            local cx = c.x
+            for i=1,#c.children do
+                local cw = c.w * c.children[i].sizeFactor
+                c.children[i].computeLayout(
+                    cx + c.padding[1],
+                    y + c.padding[2],
+                    math.min(cw,c.w - cx + c.x) - c.padding[3] * 2,
+                    c.h - c.padding[4] * 2)
+                cx = cx + cw
+            end
+        end)
     end
 
     function c.mouseInput( x, y, button,type)
         local cx,cy = x,y
-        if type == "wheelmoved" then
+        if type == "wheelmoved" then -- We dont get mouse position, only wheel movemenet
             cx,cy = love.mouse.getPosition()
         end
-        local ccx = c.x
+        local endPos = 0
+        local startPos = c.x
         for i = 1, #c.children do
-            ccx = ccx + (c.children[i].sizeFactor * c.w) + c.padding[1]
-            if cx < ccx then
+            startPos = startPos + (c.children[i].sizeFactor * c.w) + c.padding[1]
+            if cx < startPos and cx > endPos then
                 c.children[i].mouseInput( x, y, button,type)
                 break
             end
+            endPos = startPos
         end
     end
 
@@ -301,6 +318,9 @@ function lib.newTextInput(options, style)
         c.filter = "%d"
     end
 
+    function c.computeLayout(x,y,w,h)
+        c.priv_computeLayout(x,y,w,h)
+    end
 
     function c.draw()
         if c.border_color ~= nil then
@@ -381,7 +401,7 @@ function lib.newContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.outVar.x,c.outVar.y,c.outVar.w,c.outVar.h   = x,y,w,h
+        c.priv_computeLayout(x,y,w,h)
     end
 
     function c:draw()
@@ -454,7 +474,7 @@ function lib.newButton(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
+        c.priv_computeLayout(x,y,w,h)
         c.tw = w
     end
 
@@ -510,7 +530,7 @@ function lib.newButton(options, style)
             local w = sw * scale
             local h = sh * scale
 
-            LG.draw(c.sprite,c.x + (c.w - w)/2,c.y + (c.h - h)/2, 0, scale, scale)
+            LG.draw(c.sprite,c.x + (c.w - w)/2 + c.border_size,c.y + (c.h - h)/2 + c.border_size, 0, scale, scale)
         end
 
 
@@ -557,6 +577,9 @@ function lib.newListContainer(options, style)
         table.insert(c.items,item)
     end
 
+    function c.computeLayout(x,y,w,h)
+        c.priv_computeLayout(x,y,w,h)
+    end
 
     function c.draw()
         LG.setScissor(c.x,c.y,c.w,c.h)
@@ -598,6 +621,10 @@ end
 ---@param style? sliderOptions
 function lib.newSlider(options, style)
     local c = lib.baseClass(options, style)
+
+    function c.computeLayout(x,y,w,h)
+        c.priv_computeLayout(x,y,w,h)
+    end
 
     function c.draw()
     end

@@ -53,7 +53,7 @@ function m.createRoot(panelInfo, sheetInfo)
         SHEET.showGrid = not SHEET.showGrid
     end
 
-    local root = DUI.newMainContainer({ -- Main Window
+    return DUI.newMainContainer({ -- Main Window
         child = DUI.newHorizontalContainer({
             children = {
                 DUI.newHorizontalContainer({ -- Side panel
@@ -97,8 +97,6 @@ function m.createRoot(panelInfo, sheetInfo)
                 }) 
             }
         })})
-
-        return root
 end
 
 return m

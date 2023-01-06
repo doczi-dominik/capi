@@ -41,7 +41,7 @@ local flagInfo = {}
 -- Set up multiple windows
 local WINDOWS = {
     EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo),
-    ENTRY = {},
+    PROJECT_WINDOW = require("ui.projectWindow").createWindow(),
 }
 
 -- Set the current window to the project select screen
