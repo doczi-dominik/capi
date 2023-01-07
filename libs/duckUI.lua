@@ -565,6 +565,7 @@ end
 ---@field item_height number
 ---@field items table
 ---@field color {r:number,g:number,b:number,a:number} Primary color
+---@field item function How an item should look like
 
 function lib.newListContainer(options, style)
     local c = lib.baseClass(options,style)
@@ -572,14 +573,56 @@ function lib.newListContainer(options, style)
     style = style or {}
     c.item_height = style.item_height or options.item_height or 50
     c.items = options.items or {}
+    c.item = options.item
     c.color = style.color or options.color
 
-    function c.outVar.addItem(item)
-        table.insert(c.items,item)
+    c.scrollPos = 0
+    c.maxItemsHeight = 0
+
+    c.metaitems = {}
+    setmetatable(c.items, c.metaitems)
+    c.metaitems.__mode = "k"
+
+    function c.outVar.addItem(data)
+        if c.item ~= nil then
+            local item = c.item(data)
+            c.items[item] = item
+            c.computeChildren()
+        end
     end
 
     function c.computeLayout(x,y,w,h)
         c._computeLayout(x,y,w,h)
+        c.computeChildren()
+    end
+
+    function c.computeChildren()
+        local index = 0
+        for key, value in pairs(c.items) do
+            key.computeLayout(c.x,c.y + (c.item_height * index) + c.scrollPos,c.w,c.item_height)
+            index = index + 1
+        end
+
+        c.maxItemsHeight = (c.item_height + c.margin[2] + c.margin[4]) * index
+    end
+
+    function c.mouseInput(x, y, button, type)
+        if type == "wheelmoved" then
+            c.wheelmoved(x,y)
+        end
+    end
+
+    function c.wheelmoved(x,y)
+        local outOfScreenPixels = math.floor(c.maxItemsHeight - c.h)
+
+        if y > 0 and outOfScreenPixels > 0 and c.scrollPos > -outOfScreenPixels then
+            c.scrollPos = c.scrollPos - 20
+        elseif y < 0 and c.scrollPos < 0 then
+                c.scrollPos = c.scrollPos + 20
+        end
+        print(c.scrollPos)
+        print(outOfScreenPixels)
+        c.computeChildren()
     end
 
     function c.draw()
@@ -590,17 +633,13 @@ function lib.newListContainer(options, style)
         end
 
         if c.color ~= nil then
-            LG.setColor(c.color)
-
-
-            for i = 1, #c.items do
-                if c.outVar.draw ~= nil then
-                    c.outVar.draw(c.items[i],c.x,c.y + (i - 1) * c.item_height,c.w,c.item_height)
-                else
-                    LG.print(tostring(c.items[i]),c.x, c.y + (i - 1) * c.item_height )
-                end
-            end
+            LG.setColor(c.color)           
         end
+
+        for key, value in pairs(c.items) do
+            key.draw()
+        end
+
         LG.setScissor()
     end
 

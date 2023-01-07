@@ -4,12 +4,12 @@ local m = {}
 function m.createSprite(root,spriteInfo,spritePalette)
     local spriteSelectText = {}
     spriteInfo.selectionSize = 1
-    
+
     local function reduceGrid()
         spriteInfo.selectionSize = (spriteInfo.selectionSize - 2) % 5 + 1
         spriteSelectText.setText(spriteInfo.selectionSize)
     end
-    
+
     local function increaseGrid()
         spriteInfo.selectionSize = (spriteInfo.selectionSize) % 5 + 1
         spriteSelectText.setText(spriteInfo.selectionSize)
@@ -19,8 +19,6 @@ function m.createSprite(root,spriteInfo,spritePalette)
         LG.setColor(COLOR.PRIMARY)
         LG.rectangle("fill",t.x ,t.y,t.w,t.h)
     end
-
- 
 
     return {
         DUI.newHorizontalContainer({
