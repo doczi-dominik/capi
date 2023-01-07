@@ -4,7 +4,8 @@ function m.createRoot(panelInfo, sheetInfo)
     local icons = {
         gridButton = LG.newImage("assets/icons/grid.png"),
         moveButton = LG.newImage("assets/icons/move.png"),
-        paintbrushButton = LG.newImage("assets/icons/paintbrush.png")
+        paintbrushButton = LG.newImage("assets/icons/paintbrush.png"),
+        fillButton = LG.newImage("assets/icons/fill.png")
     }
 
     sheetInfo.zoomText = {}
@@ -89,7 +90,8 @@ function m.createRoot(panelInfo, sheetInfo)
                                 DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
                                 DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
                                 DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
-                                DUI.newButton({sizeFactor = 0.75}),
+                                DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3}, tools),
+                                DUI.newButton({sizeFactor = 0.70}),
                                 DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
                         })
