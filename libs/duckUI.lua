@@ -84,7 +84,7 @@ function lib.baseClass(options, style)
     ---@param w number
     ---@param h number
     ---@param f? function # Specify object specific calculations
-    function c.priv_computeLayout(x,y,w,h,f)
+    function c._computeLayout(x,y,w,h,f)
         c.outVar.children = c.children
         c.outVar.parent = c.parent
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
@@ -131,7 +131,7 @@ function lib.newVerticalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h,
+        c._computeLayout(x,y,w,h,
         function ()
         local cy = c.y
             for i=1,#c.children do
@@ -174,7 +174,7 @@ end
 ---@field text string Text to display
 ---@field alignmet love.AlignMode | "+90"
 ---@field color {r:number,g:number,b:number,a:number} Primary color
-
+---@field font love.Font
 
 ---@param options? TextOptions
 ---@param style? TextOptions
@@ -184,11 +184,12 @@ function lib.newText(options, style)
     local c = lib.baseClass(options, style)
     c.text = options.text or ""
     c.alignmet = style.alignmet or options.alignmet or "center"
+    c.font = style.font or options.font or lib.default_font
     c.color = style.color or options.color or {0,0,0}
     c.tw = 0
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
         c.tw = w
     end
 
@@ -197,13 +198,13 @@ function lib.newText(options, style)
 
         if c.alignmet == "+90" then
             LG.print(c.text,
-            c.x + c.tw/2 - FONT:getHeight()/1.7,
-            c.y + c.h/2 + FONT:getWidth(c.text)/2,
+            c.x + c.tw/2 - c.font:getHeight()/1.7,
+            c.y + c.h/2 + c.font:getWidth(c.text)/2,
             -math.pi/2,
             1,1)
         else
-            local _, lines = lib.default_font:getWrap(c.text, c.w)
-            local y = c.y + c.h/2 - (lib.default_font:getHeight() * #lines)/2
+            local _, lines = c.font:getWrap(c.text, c.w)
+            local y = c.y + c.h/2 - (c.font:getHeight() * #lines)/2
 
             ---@diagnostic disable-next-line: param-type-mismatch
             LG.printf(c.text, c.x, y, c.w, c.alignmet)
@@ -232,7 +233,7 @@ function lib.newHorizontalContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h,
+        c._computeLayout(x,y,w,h,
         function ()        
             local cx = c.x
             for i=1,#c.children do
@@ -319,7 +320,7 @@ function lib.newTextInput(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
     end
 
     function c.draw()
@@ -401,7 +402,7 @@ function lib.newContainer(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
     end
 
     function c:draw()
@@ -474,7 +475,7 @@ function lib.newButton(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
         c.tw = w
     end
 
@@ -578,7 +579,7 @@ function lib.newListContainer(options, style)
     end
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
     end
 
     function c.draw()
@@ -623,7 +624,7 @@ function lib.newSlider(options, style)
     local c = lib.baseClass(options, style)
 
     function c.computeLayout(x,y,w,h)
-        c.priv_computeLayout(x,y,w,h)
+        c._computeLayout(x,y,w,h)
     end
 
     function c.draw()

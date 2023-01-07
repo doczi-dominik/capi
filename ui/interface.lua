@@ -91,7 +91,7 @@ function m.createRoot(panelInfo, sheetInfo)
                                 DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
                                 DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
                                 DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3}, tools),
-                                DUI.newButton({sizeFactor = 0.70}),
+                                DUI.newButton({sizeFactor = 0.7}),
                                 DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
                         })
