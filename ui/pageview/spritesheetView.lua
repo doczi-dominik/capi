@@ -8,11 +8,9 @@ function m.createSpriteSheet(root,spriteInfo)
     end
 
     local paletteName = {}
-    local paletteSpriteSize = {}
 
     spriteInfo.list = {}
     paletteName.text = ""
-    paletteSpriteSize.text = ""
 
     function spriteInfo.addItem()
         if paletteName.text == "" then return end
@@ -41,12 +39,15 @@ function m.createSpriteSheet(root,spriteInfo)
         DUI.newListContainer({
             bg_color = COLOR.PRIMARY, 
             outVar = spriteInfo.list,
+            item_highlight_color = COLOR.BUTTON_HIGHLIGHT,
             item_height = 70,
             item = function(data)
                 return DUI.newHorizontalContainer({
                     bg_color = COLOR.BUTTON_COLOR,
                     margin = {4,4,4,2},
-                    children = DUI.newText({text = "data",bg_color = COLOR.BLACK})
+                    children = {
+                        DUI.newText({text = data,bg_color = COLOR.BLACK})
+                    }
                 })
             end
         })    

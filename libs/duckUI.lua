@@ -3,7 +3,7 @@ local utf8 = require("utf8")
 
 local lib = {}
 
-local LG = love.graphics
+local LG = LG or love.graphics
 lib.default_color = {1,1,1}
 lib.default_font = LG.getFont()
 lib.window_w,lib.window_h = LG.getDimensions()
@@ -85,6 +85,8 @@ function lib.baseClass(options, style)
     ---@param h number
     ---@param f? function # Specify object specific calculations
     function c._computeLayout(x,y,w,h,f)
+        c.computeX,c.computeY,c.computeW,c.computeH,c.computeFun = x,y,w,h,f -- We don'T have to recalcuale it ourselves, only use if the data is guaranteed to not change
+
         c.outVar.children = c.children
         c.outVar.parent = c.parent
         c.x,c.y,c.w,c.h = x + c.margin[1],y + c.margin[2],w - c.margin[3] * 2,h - c.margin[4] * 2
@@ -92,6 +94,10 @@ function lib.baseClass(options, style)
 
         f = f or function () end
         f()
+    end
+
+    function c.recomputeLayout()
+        c._computeLayout(c.computeX,c.computeY,c.computeW,c.computeH,c.computeFun)
     end
 
     function c.mouseInput( x, y, button, type)
@@ -575,18 +581,19 @@ function lib.newListContainer(options, style)
     c.items = options.items or {}
     c.item = options.item
     c.color = style.color or options.color
+    c.item_highlight_color = style.item_highlight_color or options.item_highlight_color
 
     c.scrollPos = 0
     c.maxItemsHeight = 0
+    c.topBarSize = 32
 
-    c.metaitems = {}
-    setmetatable(c.items, c.metaitems)
-    c.metaitems.__mode = "k"
+    local deleteImage = LG.newImage("libs/assets/trash.png")
 
     function c.outVar.addItem(data)
         if c.item ~= nil then
             local item = c.item(data)
-            c.items[item] = item
+            item.isSelected = false
+            table.insert(c.items,item)
             c.computeChildren()
         end
     end
@@ -597,28 +604,60 @@ function lib.newListContainer(options, style)
     end
 
     function c.computeChildren()
-        local index = 0
-        for key, value in pairs(c.items) do
-            key.computeLayout(c.x,c.y + (c.item_height * index) + c.scrollPos,c.w,c.item_height)
-            index = index + 1
+        local itemCount = 0
+        for i = 1, #c.items do
+            c.items[i].computeLayout(c.x,c.y + (c.topBarSize * lib.getScale()) + (c.item_height * (i-1)) + c.scrollPos,c.w,c.item_height)
+            itemCount = i
         end
 
-        c.maxItemsHeight = (c.item_height + c.margin[2] + c.margin[4]) * index
+        c.maxItemsHeight = (c.item_height + c.margin[2] + c.margin[4]) * itemCount
     end
 
     function c.mouseInput(x, y, button, type)
         if type == "wheelmoved" then
             c.wheelmoved(x,y)
+        elseif type == "mousepressed" then
+            c.mousepressed(x,y,button)
         end
     end
 
-    function c.wheelmoved(x,y)
-        local outOfScreenPixels = math.floor(c.maxItemsHeight - c.h)
+    function c.mousepressed(x,y,button)
 
-        if y > 0 and outOfScreenPixels > 0 and c.scrollPos > -outOfScreenPixels then
-            c.scrollPos = c.scrollPos - 20
-        elseif y < 0 and c.scrollPos < 0 then
-                c.scrollPos = c.scrollPos + 20
+        if y > c.y + c.topBarSize * lib.getScale() then -- Handle items
+            local startPos = y-c.y + (c.topBarSize * lib.getScale())
+
+            local itemIndex = math.floor(startPos / c.item_height)
+
+            -- If the items don't exist, don't search for them
+            if itemIndex > #c.items then
+                return
+            end
+
+            c.items[itemIndex].isSelected = not c.items[itemIndex].isSelected
+        else -- Handle top bar interaction
+            if x > c.w - c.topBarSize then
+                c.removeSelectedItems()
+            end
+        end
+    end
+
+    function c.removeSelectedItems()
+        for i = #c.items, 1,-1 do
+            if c.items[i].isSelected then
+                table.remove(c.items,i)
+            end
+        end
+        c.parent.recomputeLayout()
+    end
+
+    function c.wheelmoved(x,y)
+        local outOfScreenPixels = math.floor(c.maxItemsHeight - c.h + c.topBarSize)
+        local scrollSpeed = 40
+
+        if y < 0 and outOfScreenPixels > 0 and c.scrollPos > -outOfScreenPixels then
+            c.scrollPos = c.scrollPos - scrollSpeed
+        elseif y > 0 and c.scrollPos < 0 then
+                c.scrollPos = c.scrollPos + scrollSpeed
         end
         print(c.scrollPos)
         print(outOfScreenPixels)
@@ -626,18 +665,34 @@ function lib.newListContainer(options, style)
     end
 
     function c.draw()
-        LG.setScissor(c.x,c.y,c.w,c.h)
+        local topBar = c.topBarSize * lib.getScale()
+
+
         if c.bg_color ~= nil then
             LG.setColor(c.bg_color)
-            LG.rectangle(c.fillMode,c.x,c.y,c.w,c.h)
+            LG.rectangle(c.fillMode,c.x,c.y + topBar,c.w,c.h - topBar)
         end
 
         if c.color ~= nil then
-            LG.setColor(c.color)           
+            LG.setColor(c.color)
         end
 
-        for key, value in pairs(c.items) do
-            key.draw()
+        -- Draw top bar buttons
+
+        lib.drawSprite(deleteImage,c.x + c.w - topBar,c.y,topBar,topBar)
+
+        LG.setScissor(c.x,c.y + topBar,c.w,c.h - topBar)
+        for i = 1, #c.items do
+            local last_color = c.items[i].bg_color
+            if c.items[i].isSelected and c.item_highlight_color ~= nil then -- Set bg color as highlight
+                last_color = c.items[i].bg_color
+                c.items[i].bg_color = c.item_highlight_color
+            end
+
+            c.items[i].draw()
+
+            -- Reset item color
+            c.items[i].bg_color = last_color
         end
 
         LG.setScissor()
@@ -774,6 +829,20 @@ function lib.update()
     if lib.current_focus.update ~= nil then
         lib.current_focus.update()
     end
+end
+
+function lib.drawSprite(drawable,x,y,w,h)
+    local sw = drawable:getWidth()
+    local sh = drawable:getHeight()
+
+    local scaleX = w / sw
+    local scaleY = h / sh
+
+    local scale = math.min(scaleX, scaleY)
+    local width = sw * scale
+    local height = sh * scale
+
+    LG.draw(drawable,x + (w - width)/2,y + (h - height)/2 , 0, scale, scale)
 end
 
 function lib.keypressed(key, scancode, isrepeat)
