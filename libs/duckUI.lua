@@ -585,9 +585,11 @@ function lib.newListContainer(options, style)
 
     c.scrollPos = 0
     c.maxItemsHeight = 0
-    c.topBarSize = 32
+    c.topBarSize = 28
 
     local deleteImage = LG.newImage("libs/assets/trash.png")
+    local selectImage = LG.newImage("libs/assets/select.png")
+    local deselectImage = LG.newImage("libs/assets/deselect.png")
 
     function c.outVar.addItem(data)
         if c.item ~= nil then
@@ -622,11 +624,12 @@ function lib.newListContainer(options, style)
     end
 
     function c.mousepressed(x,y,button)
+        local barSize = c.topBarSize * lib.getScale()
 
-        if y > c.y + c.topBarSize * lib.getScale() then -- Handle items
-            local startPos = y-c.y + (c.topBarSize * lib.getScale())
+        if y > c.y + barSize then -- Handle items
+            local startPos = y-c.y + barSize
 
-            local itemIndex = math.floor(startPos / c.item_height)
+            local itemIndex = math.floor((startPos - c.scrollPos) / c.item_height)
 
             -- If the items don't exist, don't search for them
             if itemIndex > #c.items then
@@ -635,33 +638,54 @@ function lib.newListContainer(options, style)
 
             c.items[itemIndex].isSelected = not c.items[itemIndex].isSelected
         else -- Handle top bar interaction
-            if x > c.w - c.topBarSize then
+            if x > c.x + c.w - barSize then
                 c.removeSelectedItems()
+            elseif x > c.x + c.w - barSize * 2 then
+                c.setAllSelect(true)
+            elseif x > c.x + c.w - barSize * 3 then
+                c.setAllSelect(false)
             end
         end
     end
 
     function c.removeSelectedItems()
+
         for i = #c.items, 1,-1 do
             if c.items[i].isSelected then
                 table.remove(c.items,i)
             end
         end
+
+        c.computeChildren()
+
+        if math.floor(c.maxItemsHeight - c.h) < 0 then
+            c.scrollPos = 0
+        end
+
         c.parent.recomputeLayout()
     end
 
     function c.wheelmoved(x,y)
-        local outOfScreenPixels = math.floor(c.maxItemsHeight - c.h + c.topBarSize)
+        local outOfScreenPixels = math.floor(c.maxItemsHeight - c.h)
         local scrollSpeed = 40
+
+        if outOfScreenPixels < 0 then
+            c.scrollPos = 0
+        end
 
         if y < 0 and outOfScreenPixels > 0 and c.scrollPos > -outOfScreenPixels then
             c.scrollPos = c.scrollPos - scrollSpeed
         elseif y > 0 and c.scrollPos < 0 then
-                c.scrollPos = c.scrollPos + scrollSpeed
+                c.scrollPos = math.min(c.scrollPos + scrollSpeed,outOfScreenPixels)
         end
-        print(c.scrollPos)
-        print(outOfScreenPixels)
+
         c.computeChildren()
+    end
+
+    function c.setAllSelect(bool)
+        for i = 1, #c.items do
+            c.items[i].isSelected = bool
+        end
     end
 
     function c.draw()
@@ -679,7 +703,9 @@ function lib.newListContainer(options, style)
 
         -- Draw top bar buttons
 
-        lib.drawSprite(deleteImage,c.x + c.w - topBar,c.y,topBar,topBar)
+        lib.drawSprite(deleteImage,c.x + c.w - topBar ,c.y,topBar,topBar)
+        lib.drawSprite(selectImage,c.x + c.w - topBar * 2,c.y,topBar,topBar)
+        lib.drawSprite(deselectImage,c.x + c.w - topBar * 3,c.y,topBar,topBar)
 
         LG.setScissor(c.x,c.y + topBar,c.w,c.h - topBar)
         for i = 1, #c.items do

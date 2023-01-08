@@ -1,1 +1,2 @@
 trash.png - https://www.flaticon.com/free-icon/trash_3096673?term=trash&related_id=3096673
+select.png, deselect.png - https://www.flaticon.com/free-icon/answer_4118709?term=x+select&related_id=4118709
