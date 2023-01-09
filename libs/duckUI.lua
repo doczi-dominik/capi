@@ -52,6 +52,7 @@ function lib.baseClass(options, style)
 
         return t
     end
+
     
     if type(c.padding) == "number" then
         c.padding = handleNumberInput(c.padding)
@@ -155,15 +156,20 @@ function lib.newVerticalContainer(options, style)
         if type == "wheelmoved" then -- We dont get mouse position, only wheel movemenet
             cx,cy = love.mouse.getPosition()
         end
-        local endPos = 0
-        local startPos = c.y
+        local endPos = c.padding[2]
+        local startPos = c.y + c.padding[2]
+
+        print(c.debug_name, startPos)
         for i = 1, #c.children do
-            startPos = startPos + (c.children[i].sizeFactor * c.h) + c.padding[2]
+            startPos = startPos + math.min(c.children[i].sizeFactor * c.h,c.h - startPos + c.y) + c.children[i].margin[2]
+            print("vert",c.children[i].debug_name,startPos .. " | " .. endPos, x.. " | ".. y,c.y,c.h)
             if cy < startPos and cy > endPos then
                 c.children[i].mouseInput( x, y, button, type)
                 break
             end
+            startPos = startPos + c.children[i].margin[4]
             endPos = startPos
+
         end
     end
 
@@ -190,7 +196,7 @@ function lib.newText(options, style)
     local c = lib.baseClass(options, style)
     c.text = options.text or ""
     c.alignmet = style.alignmet or options.alignmet or "center"
-    c.font = style.font or options.font or lib.default_font
+    c.font = style.font or options.font or lib.default_font ---@type love.Font
     c.color = style.color or options.color or {0,0,0}
     c.tw = 0
 
@@ -213,7 +219,7 @@ function lib.newText(options, style)
             local y = c.y + c.h/2 - (c.font:getHeight() * #lines)/2
 
             ---@diagnostic disable-next-line: param-type-mismatch
-            LG.printf(c.text, c.x, y, c.w, c.alignmet)
+            LG.printf(c.text,c.font, c.x, y, c.w, c.alignmet)
         end
     end
 
@@ -259,14 +265,16 @@ function lib.newHorizontalContainer(options, style)
         if type == "wheelmoved" then -- We dont get mouse position, only wheel movemenet
             cx,cy = love.mouse.getPosition()
         end
-        local endPos = 0
-        local startPos = c.x
+        local endPos = c.padding[1]
+        local startPos = c.x + c.padding[1]
         for i = 1, #c.children do
-            startPos = startPos + (c.children[i].sizeFactor * c.w) + c.padding[1]
+            startPos = startPos + math.min(c.children[i].sizeFactor * c.w,c.w - startPos + c.x) + c.children[i].margin[1]
+            print("vert",c.children[i].debug_name,startPos .. " | " .. endPos, x.. " | ".. y,c.x,c.w)
             if cx < startPos and cx > endPos then
                 c.children[i].mouseInput( x, y, button,type)
                 break
             end
+            startPos = startPos + c.children[i].margin[3]
             endPos = startPos
         end
     end
@@ -292,6 +300,7 @@ end
 ---@field alignmet "center" | "left" | "right"
 ---@field placeholder string
 ---@field onEnter function
+---@field font love.Font
 
 ---@param options? textInputOptions
 ---@param style? textInputOptions
@@ -308,6 +317,7 @@ function lib.newTextInput(options, style)
     c.filter = style.filter or options.filter or "any"
     c.alignmet = style.alignmet or options.alignmet or "left"
     c.placeholder = style.placeholder or options.placeholder or ""
+    c.font = style.font or options.font or lib.default_font ---@type love.Font
     c.onEnter = style.onEnter or options.onEnter
 
     function c.getTextLength()
@@ -346,13 +356,9 @@ function lib.newTextInput(options, style)
         if c.color ~= nil and c.text ~= "" then
             LG.setColor(c.color)
             LG.setScissor(c.x + c.border_size,c.y + c.border_size,c.w -  c.border_size * 2,c.h -  c.border_size * 2)
-            if c.alignmet == "left" then
-                LG.print(c.text,c.x + c.padding[1] + c.border_size,c.y + c.h / 2 - lib.default_font:getHeight()/2)
-            elseif c.alignmet == "center" then
-                LG.print(c.text,c.x + c.w / 2 - lib.default_font:getWidth(c.text)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)
-            elseif c.alignmet == "right" then
-                LG.print(c.text, c.w - lib.default_font:getWidth(c.text),c.y + c.h / 2 - lib.default_font:getHeight()/2)
-            end
+            
+            local y = c.y + c.h/2 - c.font:getHeight()/2
+            LG.printf(c.text,c.font, c.x + c.border_size, y, c.w, c.alignmet)
         else
             LG.setColor(0.6,0.6,0.6)
             LG.print(c.placeholder,c.x + c.w / 2 - lib.default_font:getWidth(c.placeholder)/2,c.y + c.h / 2 - lib.default_font:getHeight()/2)

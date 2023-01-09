@@ -1,5 +1,6 @@
 ---@diagnostic disable: duplicate-set-field
 
+
 ------- GLOBALS ------
 
 --#region
@@ -7,7 +8,10 @@ DESIGN_W, DESIGN_H = 1280, 720
 WINDOW_W, WINDOW_H = 0, 0
 SCALE = 0
 
-FONT = love.graphics.newFont("assets/font/monogram-extended.ttf", 28)
+require("ui.colors")
+require("ui.style")
+
+FONT = STYLE.FONTS.DEFAULT
 FONT_HEIGHT = FONT:getHeight()
 --#endregion
 
@@ -27,8 +31,6 @@ LG.setFont(FONT)
 --#region
 DUI = require("libs.duckUI")
 DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
-require("ui.colors")
-require("ui.style")
 --#endregion
 
 
@@ -45,7 +47,7 @@ local WINDOWS = {
 }
 
 -- Set the current window to the project select screen
-local current_window = WINDOWS.EDITOR
+local current_window = WINDOWS.PROJECT_WINDOW
 
 for i = 1, #WINDOWS do
     WINDOWS[i].computeLayout()
