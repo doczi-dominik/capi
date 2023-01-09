@@ -40,18 +40,16 @@ local spriteInfo = {}
 local spritePalette = {}
 local flagInfo = {}
 
+
 -- Set up multiple windows
-local WINDOWS = {
+WINDOWS = {
     EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo),
     PROJECT_WINDOW = require("ui.projectWindow").createWindow(),
 }
 
 -- Set the current window to the project select screen
-local current_window = WINDOWS.PROJECT_WINDOW
 
-for i = 1, #WINDOWS do
-    WINDOWS[i].computeLayout()
-end
+CURRENT_WINDOW = WINDOWS.PROJECT_WINDOW
 
 -- Set up multiple sidebar pages
 PAGES = {
@@ -90,30 +88,30 @@ function love.resize(w, h)
     SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
 
     DUI.resize(w,h)
-    current_window.computeLayout()
+    CURRENT_WINDOW.computeLayout()
 end
 
 function love.mousepressed(x, y, button)
-    current_window.mouseInput(x, y, button, "mousepressed")
+    CURRENT_WINDOW.mouseInput(x, y, button, "mousepressed")
 end
 
 function love.mousereleased(x, y, button)
-    current_window.mouseInput(x, y, button, "mousereleased")
+    CURRENT_WINDOW.mouseInput(x, y, button, "mousereleased")
 end
 
 function love.mousemoved(x, y)
-    current_window.mouseInput(x, y, nil, "mousemoved")
+    CURRENT_WINDOW.mouseInput(x, y, nil, "mousemoved")
 end
 
 function love.wheelmoved(x, y)
-    current_window.mouseInput(x, y, nil, "wheelmoved")
+    CURRENT_WINDOW.mouseInput(x, y, nil, "wheelmoved")
 end
 
 function love.update(dt)
 end
 
 function love.draw()
-    current_window.draw()
+    CURRENT_WINDOW.draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)

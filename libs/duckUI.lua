@@ -159,10 +159,8 @@ function lib.newVerticalContainer(options, style)
         local endPos = c.padding[2]
         local startPos = c.y + c.padding[2]
 
-        print(c.debug_name, startPos)
         for i = 1, #c.children do
             startPos = startPos + math.min(c.children[i].sizeFactor * c.h,c.h - startPos + c.y) + c.children[i].margin[2]
-            print("vert",c.children[i].debug_name,startPos .. " | " .. endPos, x.. " | ".. y,c.y,c.h)
             if cy < startPos and cy > endPos then
                 c.children[i].mouseInput( x, y, button, type)
                 break
@@ -269,7 +267,6 @@ function lib.newHorizontalContainer(options, style)
         local startPos = c.x + c.padding[1]
         for i = 1, #c.children do
             startPos = startPos + math.min(c.children[i].sizeFactor * c.w,c.w - startPos + c.x) + c.children[i].margin[1]
-            print("vert",c.children[i].debug_name,startPos .. " | " .. endPos, x.. " | ".. y,c.x,c.w)
             if cx < startPos and cx > endPos then
                 c.children[i].mouseInput( x, y, button,type)
                 break
@@ -379,7 +376,6 @@ function lib.newTextInput(options, style)
 
     function c.keypressed(key, scancode, isrepeat)
         if key == "return" then
-            lib.current_focus = {}
             if c.onEnter ~= nil then
                 c.onEnter()
             end
