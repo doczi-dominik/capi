@@ -4,7 +4,8 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
     local icons = {
         gridButton = LG.newImage("assets/icons/grid.png"),
         moveButton = LG.newImage("assets/icons/move.png"),
-        paintbrushButton = LG.newImage("assets/icons/paintbrush.png")
+        paintbrushButton = LG.newImage("assets/icons/paintbrush.png"),
+        fillButton = LG.newImage("assets/icons/fill.png")
     }
 
     sheetInfo.zoomText = {}
@@ -44,7 +45,9 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
 
     local barButtonOnClick = function(b)
         panelInfo.setChild(PAGES[b.dependencyIndex])
-        ROOT.computeLayout()
+        local p = panelInfo.parent
+        p.computeLayout(p.x - p.margin[1],p.y - p.margin[2],p.w + p.margin[3] * 2,p.h + p.margin[4] * 2)
+        
     end
 
     local toggleGrid = function()
@@ -72,7 +75,7 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                         DUI.newVerticalContainer({ -- Panel 
                             bg_color = COLOR.BUTTON_HIGHLIGHT,
                             margin = 5,
-                            padding = {4,3,4,3},
+                            padding = {3,2,3,2},
                             outVar = panelInfo
                         })
                     }
@@ -85,9 +88,10 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                             padding = {0,1,0,1},
                             children = {  -- Bottom bar buttons
                                 DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
-                                DUI.newButton({sprite = icons.moveButton, onClick = function() toolMediator.selectedTool = "move" end, defaultOn = true, dependencyIndex = 1}, tools),
-                                DUI.newButton({sprite = icons.paintbrushButton, onClick = function() toolMediator.selectedTool = "paintbrush" end, dependencyIndex = 2}, tools),
-                                DUI.newButton({sizeFactor = 0.75}),
+                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
+                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
+                                DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3}, tools),
+                                DUI.newButton({sizeFactor = 0.7}),
                                 DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
                         })

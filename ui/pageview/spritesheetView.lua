@@ -1,85 +1,56 @@
 local m = {}
 local fileManager = require("file_manager")
 
-function m.createSpriteSheet(spriteInfo)
+function m.createSpriteSheet(root,spriteInfo)
         
     local function importFileData()
         spriteInfo.importedFileData = fileManager.fileDialogue()
     end
 
     local paletteName = {}
-    local paletteSpriteSize = {}
+
+    spriteInfo.list = {}
     paletteName.text = ""
-    paletteSpriteSize.text = ""
 
-    local function removePalette(button)
-        print(button.parent.debug_name)
-        local list = button.parent.parent
-        local name = button.parent.debug_name
-        for i = 1, #list.children do
-            if list.children[i].debug_name == name then
-                table.remove(list.children, i)
-                break
-            end
-        end
+    function spriteInfo.addItem()
+        if paletteName.text == "" then return end
 
-        ROOT.computeLayout()
-    end
-
-    local function createPalette()
-        if paletteName.text == "" or paletteSpriteSize.text == "" then
-            return
-        end
-        
-        for i = 1, #spriteInfo.children do
-            if spriteInfo.children[i].debug_name == paletteName.text then
-                return
-            end
-        end
-
-        spriteInfo.addChild(DUI.newHorizontalContainer({ 
-            debug_name = paletteName.text,
-            sizeFactor = 0.1,
-            margin = {3,3,3,2},
-            bg_color = COLOR.BUTTON_COLOR,
-            children = {
-                DUI.newText({sizeFactor = 0.83, text = paletteName.text}),
-                DUI.newButton({color = COLOR.WHITE,sprite = LG.newImage("assets/icons/trash.png"),onClick = removePalette, margin = {0,3,0,0}})
-            }
-        }))
-        ROOT.computeLayout()
-
-        paletteName.text = ""
-        paletteSpriteSize.text = ""
-        paletteName.setText("")
-        paletteSpriteSize.setText("")
+        spriteInfo.list.addItem(paletteName.text)
+        paletteName.text = ""; paletteName.setText("")
     end
 
     return { 
         DUI.newHorizontalContainer({
             sizeFactor = 0.07,
+            padding = 2,
             children = {
                 DUI.newText({sizeFactor = 0.5,text = "Palette name:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name", onEnter=createPalette},STYLE.STYLEDTEXTINPUT)
+                DUI.newTextInput({alignmet ="center", filter ="any", max_characters = 20, outVar = paletteName, placeholder = "name", onEnter=spriteInfo.addItem},STYLE.STYLEDTEXTINPUT)
 
             }
         }),   
         DUI.newHorizontalContainer({
-            sizeFactor = 0.07,
-            children = {
-                DUI.newText({sizeFactor = 0.65,text = "Sprite dimension:", alignmet = "left"}),
-                DUI.newTextInput({alignmet ="center", filter ="number", max_characters = 3, outVar = paletteSpriteSize, placeholder = "16", onEnter = createPalette},STYLE.STYLEDTEXTINPUT)
-
-            }
-        }),
-        DUI.newHorizontalContainer({
-            sizeFactor = 0.09,
+            sizeFactor = 0.08,
             children = {
                 DUI.newButton({sizeFactor = 0.6, margin = 2, text = "Import image", onClick = importFileData}, STYLE.STYLEDBUTTON),
-                DUI.newButton({sizeFactor = 0.4, margin = 2, text = "Create", onClick = createPalette}, STYLE.STYLEDBUTTON),
+                DUI.newButton({sizeFactor = 0.4, margin = 2, text = "Create", onClick = spriteInfo.addItem}, STYLE.STYLEDBUTTON),
             }
         }),  
-        DUI.newVerticalContainer({bg_color = COLOR.PRIMARY, outVar = spriteInfo})    
+        DUI.newListContainer({
+            bg_color = COLOR.PRIMARY, 
+            outVar = spriteInfo.list,
+            item_highlight_color = COLOR.BUTTON_HIGHLIGHT,
+            item_height = 70,
+            item = function(data)
+                return DUI.newHorizontalContainer({
+                    bg_color = COLOR.BUTTON_COLOR,
+                    margin = {4,4,4,2},
+                    children = {
+                        DUI.newText({text = data,bg_color = COLOR.BLACK})
+                    }
+                })
+            end
+        })    
     }
 end
 
