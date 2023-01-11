@@ -1,5 +1,11 @@
 local m = {}
 
+
+---comment
+---@param panelInfo table
+---@param sheetInfo table
+---@param toolMediator toolMediator
+---@return table
 function m.createRoot(panelInfo, sheetInfo, toolMediator)
     local icons = {
         gridButton = LG.newImage("assets/icons/grid.png"),
@@ -88,9 +94,9 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                             padding = {0,1,0,1},
                             children = {  -- Bottom bar buttons
                                 DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
-                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1}, tools),
-                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2}, tools),
-                                DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3}, tools),
+                                DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1, onClick = function() toolMediator.selectedTool = "move" end}, tools),
+                                DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2, onClick = function() toolMediator.selectedTool = "paintbrush" end}, tools),
+                                DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3, onClick = function() toolMediator.selectedTool = "fill" end}, tools),
                                 DUI.newButton({sizeFactor = 0.7}),
                                 DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }

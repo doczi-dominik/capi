@@ -41,12 +41,9 @@ local spritePalette = {}
 local flagInfo = {}
 local toolMediator = require("data.tool_mediator")
 
-ROOT = require("ui.interface").createRoot(panelInfo, sheetInfo, toolMediator)
-ROOT.computeLayout()
-
 -- Set up multiple windows
 WINDOWS = {
-    EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo),
+    EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo, toolMediator),
     PROJECT_WINDOW = require("ui.projectWindow").createWindow(),
 }
 
