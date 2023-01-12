@@ -73,6 +73,24 @@ function m.init(opts)
         return cellX, cellY, isXValid and isYValid
     end
 
+    local function floodFill(cellX, cellY, spriteToReplace)
+        if cellX < 1 or cellX > cellW then return end
+        if cellY < 1 or cellY > cellH then return end
+
+        local spr = cells.data[cellY][cellX].sprites
+
+        if spr[#spr] ~= spriteToReplace then
+            return
+        end
+
+        spr[math.max(1, #spr)] = sprites.selectedIndex
+
+        floodFill(cellX - 1, cellY, spriteToReplace)
+        floodFill(cellX + 1, cellY, spriteToReplace)
+        floodFill(cellX, cellY - 1, spriteToReplace)
+        floodFill(cellX, cellY + 1, spriteToReplace)
+    end
+
     local function updateDrag(x, y)
         if dragStartX == nil or dragStartY == nil then
             return
@@ -128,6 +146,21 @@ function m.init(opts)
         drawFilter = createLayerFilter()
     end
 
+    local function onFillLeftClick(x, y)
+        local cellX, cellY, isValid = screenToCell(x, y)
+
+        if not isValid then return end
+
+        local spr = cells.data[cellY][cellX].sprites
+        local spriteToReplace = spr[#spr]
+
+        if spriteToReplace == sprites.selectedIndex then
+            return
+        end
+
+        floodFill(cellX, cellY, spriteToReplace)
+    end
+
     local function onMoveLeftRelease(x, y)
         dragStartX, dragStartY = nil, nil
     end
@@ -152,6 +185,8 @@ function m.init(opts)
             onMoveLeftClick(x, y)
         elseif toolMediator.selectedTool == "paintbrush" then
             onPaintbrushLeftClick(x, y)
+        elseif toolMediator.selectedTool == "fill" then
+            onFillLeftClick(x, y)
         end
     end
 
