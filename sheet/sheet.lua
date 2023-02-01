@@ -144,6 +144,8 @@ function m.init(opts)
         eraseEnabled = false
 
         drawFilter = createLayerFilter()
+
+        updateDraw(x, y)
     end
 
     local function onFillLeftClick(x, y)
@@ -174,6 +176,8 @@ function m.init(opts)
         drawEnabled = false
 
         eraseFilter = createLayerFilter()
+
+        updateErase(x, y)
     end
 
     local function onPaintbrushRightRelease(x, y)
