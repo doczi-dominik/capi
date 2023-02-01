@@ -7,21 +7,18 @@ local templates = require("data.library_template")
 ---@field spriteSize integer
 ---@field addSpriteSheet fun(name: string, spritesheet: love.ImageData)
 ---@field removeSpriteSheet fun(name: string)
+---@field serialize fun():string
 ---@field exportForLibrary fun()
-
----@class sheetMetadata
----@field name string
----@field spritesheet love.ImageData
 
 ---@param spriteSize integer
 ---@return spriteCollection
 local function createCollection(spriteSize)
     local c = {}
 
-    c.sheets = {}   ---@type sheetMetadata[]
-    c.data = {}
-    c.selectedIndex = 1
     c.spriteSize = spriteSize
+    c.sheets = {}   ---@type sheetMetadata[]
+    c.data = {}  ---@type sprite[]
+    c.selectedIndex = 1
 
     ---@param name string
     ---@param spritesheet love.ImageData
@@ -50,6 +47,30 @@ local function createCollection(spriteSize)
                 table.remove(c.sheets, i)
             end
         end
+    end
+
+    function c.serialize()
+        local sheets = ""
+
+        for i, s in ipairs(c.sheets) do
+            if i > 1 then
+                sheets = sheets..";sc-s;"
+            end
+
+            sheets = sheets..s.serialize()
+        end
+
+        local data = ""
+
+        for i, d in ipairs(c.data) do
+            if i > 1 then
+                data = data..";sc-d;"
+            end
+
+            data = data..d.serialize()
+        end
+
+        return string.format("%d;sc;%s;sc;%s", c.spriteSize, sheets, data)
     end
 
     function c.exportForLibrary()
