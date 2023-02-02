@@ -1,4 +1,5 @@
 local createSprite = require("data.sprite")
+local createMeta = require("data.sheet_metadata")
 local templates = require("data.library_template")
 
 ---@class spriteCollection
@@ -23,10 +24,7 @@ local function createCollection(spriteSize)
     ---@param name string
     ---@param spritesheet love.ImageData
     function c.addSpriteSheet(name, spritesheet)
-        c.sheets[#c.sheets+1] = {
-            name = name,
-            spritesheet = spritesheet
-        }
+        c.sheets[#c.sheets+1] = createMeta(name, spritesheet)
 
         local img = LG.newImage(spritesheet)
         local sw, sh = spritesheet:getDimensions()

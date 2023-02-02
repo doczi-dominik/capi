@@ -4,12 +4,10 @@
 ---@field encodeSheet fun():string
 ---@field serialize fun():string
 
-local m = {}
-
 ---@param name string
 ---@param spritesheet love.ImageData
 ---@return sheetMetadata
-function m.createSheetMetadata(name, spritesheet)
+local function createSheetMetadata(name, spritesheet)
     local m = {}  ---@type sheetMetadata
 
     m.name = name
@@ -26,4 +24,4 @@ function m.createSheetMetadata(name, spritesheet)
     return m
 end
 
-return m
+return createSheetMetadata

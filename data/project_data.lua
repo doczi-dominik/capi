@@ -19,12 +19,16 @@ local function split(s, delim)
     return result
 end
 
-function m.create(spriteSize)
+---@param spriteSize integer
+---@param mapWidth integer
+---@param mapHeight integer
+---@return projectData
+function m.create(spriteSize, mapWidth, mapHeight)
     local p = {}
 
     p.version = 0
     p.sprites = createSprites(spriteSize)
-    p.cells = createCells(8, 8)
+    p.cells = createCells(mapWidth, mapHeight)
 
     function p.serialize()
         return string.format("%d;pd;%s;pd;%s", p.version, p.sprites.serialize(), p.cells.serialize())

@@ -62,17 +62,15 @@ PAGES = {
 -- Default page when the program starts
 panelInfo.setChild(PAGES[1])
 
-local spriteCollection = require("data.sprite_collection")(16)
+local projectData = require("data.project_data").create(16, 8, 8)
 
-spriteCollection.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
-
-local cellCollection = require("data.cell_collection")(8, 8)
+projectData.sprites.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
 
 SHEET = require("sheet.sheet")
 SHEET.init({
     info = sheetInfo,
-    sprites = spriteCollection,
-    cells = cellCollection,
+    sprites = projectData.sprites,
+    cells = projectData.cells,
     toolMediator = toolMediator
 })
 
