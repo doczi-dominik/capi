@@ -1,3 +1,9 @@
+local utils = require("data.utils")
+
+local m = {}
+
+m.SER_DELIM = ";sm;"
+
 ---@class sheetMetadata
 ---@field name string
 ---@field spritesheet love.ImageData
@@ -7,21 +13,31 @@
 ---@param name string
 ---@param spritesheet love.ImageData
 ---@return sheetMetadata
-local function createSheetMetadata(name, spritesheet)
-    local m = {}  ---@type sheetMetadata
+function m.create(name, spritesheet)
+    local d = {}  ---@type sheetMetadata
 
-    m.name = name
-    m.spritesheet = spritesheet
+    d.name = name
+    d.spritesheet = spritesheet
 
-    function m.encodeSheet()
-        return m.spritesheet:encode("png"):getString()
+    function d.encodeSheet()
+        return d.spritesheet:encode("png"):getString()
     end
 
     function m.serialize()
-        return string.format("%s;sm;%s", m.name, m.encodeSheet())
+        return string.format("%s%s%s", d.name, m.SER_DELIM, d.encodeSheet())
     end
 
-    return m
+    return d
 end
 
-return createSheetMetadata
+function m.deserialize(serialized)
+    local parts = utils.split(serialized, m.SER_DELIM)
+    local name = parts[1]
+
+    local fd = love.filesystem.newFileData(parts[2], name)
+    local decoded = love.image.newImageData(fd)
+
+    return name, decoded
+end
+
+return m

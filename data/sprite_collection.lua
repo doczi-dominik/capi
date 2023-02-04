@@ -1,6 +1,13 @@
-local createSprite = require("data.sprite")
-local createMeta = require("data.sheet_metadata")
+local sprite = require("data.sprite")
+local sheetMeta = require("data.sheet_metadata")
 local templates = require("data.library_template")
+local utils = require("data.utils")
+
+local m = {}
+
+m.SER_DELIM = ";sc;"
+m.SER_SHEET_DELIM = ";sc-s;"
+m.SER_DATA_DELIM = ";sc-d;"
 
 ---@class spriteCollection
 ---@field data sprite[]
@@ -9,12 +16,12 @@ local templates = require("data.library_template")
 ---@field addSpriteSheet fun(name: string, spritesheet: love.ImageData)
 ---@field removeSpriteSheet fun(name: string)
 ---@field serialize fun():string
----@field exportForLibrary fun()
+---@field exportForLibrary fun():string
 
 ---@param spriteSize integer
 ---@return spriteCollection
-local function createCollection(spriteSize)
-    local c = {}
+function m.create(spriteSize)
+    local c = {}  ---@type spriteCollection
 
     c.spriteSize = spriteSize
     c.sheets = {}   ---@type sheetMetadata[]
@@ -24,14 +31,14 @@ local function createCollection(spriteSize)
     ---@param name string
     ---@param spritesheet love.ImageData
     function c.addSpriteSheet(name, spritesheet)
-        c.sheets[#c.sheets+1] = createMeta(name, spritesheet)
+        c.sheets[#c.sheets+1] = sheetMeta.create(name, spritesheet)
 
         local img = LG.newImage(spritesheet)
         local sw, sh = spritesheet:getDimensions()
 
         for y = 0, sh, spriteSize do
             for x = 0, sw, spriteSize do
-                c.data[#c.data+1] = createSprite(img, spriteSize, x, y)
+                c.data[#c.data+1] = sprite.create(img, spriteSize, x, y)
             end
         end
     end
@@ -52,7 +59,7 @@ local function createCollection(spriteSize)
 
         for i, s in ipairs(c.sheets) do
             if i > 1 then
-                sheets = sheets..";sc-s;"
+                sheets = sheets..m.SER_SHEET_DELIM
             end
 
             sheets = sheets..s.serialize()
@@ -62,13 +69,13 @@ local function createCollection(spriteSize)
 
         for i, d in ipairs(c.data) do
             if i > 1 then
-                data = data..";sc-d;"
+                data = data..m.SER_DATA_DELIM
             end
 
             data = data..d.serialize()
         end
 
-        return string.format("%d;sc;%s;sc;%s", c.spriteSize, sheets, data)
+        return string.format("%d%s%s%s%s", c.spriteSize, m.SER_DELIM, sheets, m.SER_DELIM, data)
     end
 
     function c.exportForLibrary()
@@ -104,4 +111,32 @@ local function createCollection(spriteSize)
     return c
 end
 
-return createCollection
+---@param serialized string
+---@return spriteCollection?
+function m.load(serialized)
+    local parts = utils.split(serialized, m.SER_DELIM)
+
+    local sprSize = tonumber(parts[1])
+
+    if sprSize == nil then
+        return
+    end
+
+    local c = m.create(sprSize)
+
+    local serializedSheets = utils.split(parts[2], m.SER_SHEET_DELIM)
+
+    for _, s in ipairs(serializedSheets) do
+        c.addSpriteSheet(sheetMeta.deserialize(s))
+    end
+
+    local serializedData = utils.split(parts[3], m.SER_DATA_DELIM)
+
+    for i, s in ipairs(serializedData) do
+        c.data[i].load(s)
+    end
+
+    return c
+end
+
+return m

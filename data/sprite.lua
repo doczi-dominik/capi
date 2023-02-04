@@ -1,7 +1,13 @@
+local utils = require("data.utils")
+
+local m = {}
+
+m.SER_DELIM = ";sf;"
 
 ---@class sprite
 ---@field flags string[]
 ---@field serialize fun():string
+---@field load fun(serialized: string)
 ---@field draw fun(x: number, y: number)
 
 ---@param image love.Image
@@ -10,7 +16,7 @@
 ---@param sy integer
 ---@param flags string[]?
 ---@return sprite
-local function createSprite(image, size, sx, sy, flags)
+function m.create(image, size, sx, sy, flags)
     local s = {}
     local quad = LG.newQuad(sx, sy, size, size, image:getDimensions())
 
@@ -21,13 +27,17 @@ local function createSprite(image, size, sx, sy, flags)
 
         for i, f in ipairs(s.flags) do
             if i > 1 then
-                str = str..";sf;"
+                str = str..m.SER_DELIM
             end
 
             str = str..f
         end
 
         return str
+    end
+
+    function s.load(serialized)
+        s.flags = utils.split(serialized, m.SER_DELIM)
     end
 
     function s.draw(x, y)
@@ -37,4 +47,4 @@ local function createSprite(image, size, sx, sy, flags)
     return s
 end
 
-return createSprite
+return m
