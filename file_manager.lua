@@ -33,4 +33,14 @@ function m.readFile(path)
     return love.filesystem.newFileData(data, path)
 end
 
+function m.writeFile(path, contents)
+    local f = io.open(path, "w")
+
+    if f == nil then
+        return
+    end
+
+    f:write(contents)
+end
+
 return m
