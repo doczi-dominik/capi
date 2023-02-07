@@ -271,7 +271,7 @@ function m.init(opts)
             for x = 0, cellW - 1 do
                 local cell = cells.data[y + 1][x + 1]
 
-                for _, i in ipairs(cell.sprites) do
+                for _, i in ipairs(cell.sprites) do    
                     sprites.data[i].draw(x * sprSize, y * sprSize)
                 end
             end

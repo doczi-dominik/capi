@@ -4,7 +4,7 @@ local utils = require("data.utils")
 local m = {}
 
 m.SER_DELIM = ";cc;"
-m.SER_DATA_DELIM = ";cc-d;"
+m.SER_DATA_DELIM = ";cc_d;"
 
 ---@class cellCollection
 ---@field width integer

@@ -3,8 +3,8 @@ local utils = require "data.utils"
 local m = {}
 
 m.SER_DELIM = ";c;"
-m.SER_SPR_DELIM = ";c-s;"
-m.SER_FLAG_DELIM = ";c-f;"
+m.SER_SPR_DELIM = ";c_s;"
+m.SER_FLAG_DELIM = ";c_f;"
 
 ---@class cell
 ---@field sprites integer[]

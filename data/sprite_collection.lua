@@ -6,8 +6,8 @@ local utils = require("data.utils")
 local m = {}
 
 m.SER_DELIM = ";sc;"
-m.SER_SHEET_DELIM = ";sc-s;"
-m.SER_DATA_DELIM = ";sc-d;"
+m.SER_SHEET_DELIM = ";sc_s;"
+m.SER_DATA_DELIM = ";sc_d;"
 
 ---@class spriteCollection
 ---@field data sprite[]
