@@ -23,7 +23,7 @@ function m.create(name, spritesheet)
         return d.spritesheet:encode("png"):getString()
     end
 
-    function m.serialize()
+    function d.serialize()
         return string.format("%s%s%s", d.name, m.SER_DELIM, d.encodeSheet())
     end
 
