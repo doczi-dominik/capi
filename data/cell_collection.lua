@@ -36,7 +36,7 @@ function m.create(width, height)
 
         for y = 1, c.height do
             for x = 1, c.width do
-                if y ~= 1 and x ~= 1 then
+                if y ~= 1 or x ~= 1 then
                     data = data..m.SER_DATA_DELIM
                 end
 
