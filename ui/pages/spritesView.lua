@@ -6,18 +6,13 @@ function m.createSprite(root,spriteInfo,spritePalette)
     spriteInfo.selectionSize = 1
 
     local function reduceGrid()
-        spriteInfo.selectionSize = (spriteInfo.selectionSize - 2) % 5 + 1
+        spriteInfo.selectionSize = (spriteInfo.selectionSize - 2) % 4 + 1
         spriteSelectText.setText(spriteInfo.selectionSize)
     end
 
     local function increaseGrid()
-        spriteInfo.selectionSize = (spriteInfo.selectionSize) % 5 + 1
+        spriteInfo.selectionSize = (spriteInfo.selectionSize) % 4 + 1
         spriteSelectText.setText(spriteInfo.selectionSize)
-    end
-
-    function spritePalette.draw(t)
-        LG.setColor(COLOR.PRIMARY)
-        LG.rectangle("fill",t.x ,t.y,t.w,t.h)
     end
 
     return {

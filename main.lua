@@ -37,7 +37,6 @@ DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 local sheetInfo = {}
 local panelInfo =  {}
 local spriteInfo = {}
-local spritePalette = {}
 local flagInfo = {}
 local toolMediator = require("data.tool_mediator")
 
@@ -51,20 +50,22 @@ WINDOWS = {
 
 CURRENT_WINDOW = WINDOWS.PROJECT_WINDOW
 
+local projectData = require("data.project_data").create(16, 8, 8)
+
+projectData.sprites.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
+
+local spritePalette = require("ui.spritePalette")(projectData.sprites)
+
 -- Set up multiple sidebar pages
 PAGES = {
-    require("ui.pageview.spritesheetView").createSpriteSheet(WINDOWS.EDITOR,spriteInfo),
-    require("ui.pageview.spritesView").createSprite(WINDOWS.EDITOR,spriteInfo,spritePalette),
-    require("ui.pageview.flagView").createFlagView(WINDOWS.EDITOR,flagInfo),
-    require("ui.pageview.projectView").createExportView(WINDOWS.EDITOR)
+    require("ui.pages.spritesheetView").createSpriteSheet(WINDOWS.EDITOR,spriteInfo),
+    require("ui.pages.spritesView").createSprite(WINDOWS.EDITOR,spriteInfo,spritePalette),
+    require("ui.pages.flagView").createFlagView(WINDOWS.EDITOR,flagInfo),
+    require("ui.pages.projectView").createExportView(WINDOWS.EDITOR)
 }
 
 -- Default page when the program starts
 panelInfo.setChild(PAGES[1])
-
-local projectData = require("data.project_data").create(16, 8, 8)
-
-projectData.sprites.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
 
 SHEET = require("sheet.sheet")
 SHEET.init({

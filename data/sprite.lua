@@ -9,6 +9,7 @@ m.SER_DELIM = ";sf;"
 ---@field serialize fun():string
 ---@field load fun(serialized: string)
 ---@field draw fun(x: number, y: number)
+---@field drawForPalette fun(x: number, y: number)
 
 ---@param image love.Image
 ---@param size integer
@@ -42,6 +43,12 @@ function m.create(image, size, sx, sy, flags)
 
     function s.draw(x, y)
         LG.draw(image, quad, x, y)
+    end
+
+    function s.drawForPalette(x, y)
+        local scale = 48 / size
+
+        LG.draw(image, quad, x, y, 0, scale, scale)
     end
 
     return s
