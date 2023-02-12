@@ -29,6 +29,8 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
         drawExt = function (self)
             if self.isOn then
                 self.w = self.tw + self.parent.padding[3] * 2+ self.parent.margin[3] * 2
+            else 
+                self.w = self.tw
             end
         end,
     }
@@ -52,7 +54,7 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
     local barButtonOnClick = function(b)
         panelInfo.setChild(PAGES[b.dependencyIndex])
         local p = panelInfo.parent
-        p.computeLayout(p.x - p.margin[1],p.y - p.margin[2],p.w + p.margin[3] * 2,p.h + p.margin[4] * 2)
+        p.computeLayout(p.computeX, p.computeY, p.computeW, p.computeH, p.computeFun)
         
     end
 
@@ -64,7 +66,7 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
         child = DUI.newHorizontalContainer({
             children = {
                 DUI.newHorizontalContainer({ -- Side panel
-                    sizeFactor = 0.28,
+                    sizeFactor = 0.26,
                     bg_color = COLOR.PRIMARY,
                     children = {
                         DUI.newVerticalContainer({ -- Actionbar
@@ -78,11 +80,17 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                                 DUI.newButton({dependencyIndex = 4,text = "Project", onClick = barButtonOnClick}, barButtonStyle),
                             }
                         }),
-                        DUI.newVerticalContainer({ -- Panel 
+                        DUI.newVerticalContainer({ -- Panel BG
                             bg_color = COLOR.BUTTON_HIGHLIGHT,
                             margin = 5,
-                            padding = {3,2,3,2},
-                            outVar = panelInfo
+                            padding = 1,
+                            children = {
+                                DUI.newVerticalContainer({ -- Panel Content
+                                    margin = 4,
+                                    padding = 1,
+                                    outVar = panelInfo
+                                })
+                            }
                         })
                     }
                 }),

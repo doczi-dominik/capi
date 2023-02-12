@@ -1,6 +1,5 @@
 ---@diagnostic disable: duplicate-set-field
 
-
 ------- GLOBALS ------
 
 --#region
@@ -15,27 +14,24 @@ FONT = STYLE.FONTS.DEFAULT
 FONT_HEIGHT = FONT:getHeight()
 --#endregion
 
-
 -------- LOVE CONFIG -------
 
 --#region
 LG = love.graphics
-LG.setDefaultFilter("nearest","nearest")
+LG.setDefaultFilter("nearest", "nearest")
 
 LG.setFont(FONT)
 --#endregion
-
 
 ------ LIBRARY SETUP ---------
 
 --#region
 DUI = require("libs.duckUI")
-DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
+DUI.setDefaultResolution(DESIGN_W, DESIGN_H)
 --#endregion
 
-
 local sheetInfo = {}
-local panelInfo =  {}
+local panelInfo = {}
 local spriteInfo = {}
 local flagInfo = {}
 local toolMediator = require("data.tool_mediator")
@@ -75,51 +71,49 @@ SHEET.init({
     toolMediator = toolMediator
 })
 
-
-
 --#region- LOVE FUNCTIONS
 
 function love.load()
-    DUI.load()
+	love.window.maximize()
+	DUI.load()
 end
 
 function love.resize(w, h)
-    WINDOW_W, WINDOW_H = w, h
-    SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
+	WINDOW_W, WINDOW_H = w, h
+	SCALE = math.min(WINDOW_W / DESIGN_W, WINDOW_H / DESIGN_H)
 
-    DUI.resize(w,h)
-    CURRENT_WINDOW.computeLayout()
+	DUI.resize(w, h)
+	CURRENT_WINDOW.computeLayout()
 end
 
 function love.mousepressed(x, y, button)
-    CURRENT_WINDOW.mouseInput(x, y, button, "mousepressed")
+	CURRENT_WINDOW.mouseInput(x, y, button, "mousepressed")
 end
 
 function love.mousereleased(x, y, button)
-    CURRENT_WINDOW.mouseInput(x, y, button, "mousereleased")
+	CURRENT_WINDOW.mouseInput(x, y, button, "mousereleased")
 end
 
 function love.mousemoved(x, y)
-    CURRENT_WINDOW.mouseInput(x, y, nil, "mousemoved")
+	CURRENT_WINDOW.mouseInput(x, y, nil, "mousemoved")
 end
 
 function love.wheelmoved(x, y)
-    CURRENT_WINDOW.mouseInput(x, y, nil, "wheelmoved")
+	CURRENT_WINDOW.mouseInput(x, y, nil, "wheelmoved")
 end
 
-function love.update(dt)
-end
+function love.update(dt) end
 
 function love.draw()
-    CURRENT_WINDOW.draw()
+	CURRENT_WINDOW.draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    DUI.keypressed(key, scancode, isrepeat)
+	DUI.keypressed(key, scancode, isrepeat)
 end
 
 function love.textinput(t)
-    DUI.textinput(t)
+	DUI.textinput(t)
 end
 
 --#endregion

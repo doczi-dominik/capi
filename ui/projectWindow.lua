@@ -33,7 +33,7 @@ function m.createWindow()
                                 DUI.newButton({sizeFactor=0.07,sprite=titleImage})
                             }
                         }),
-                        DUI.newText({sizeFactor=0.01,text="v.0.0.80085"}),
+                        DUI.newText({sizeFactor=0.01,text="v.0.1"}),
                         DUI.newText({sizeFactor=0.1}), -- BreakLine
                         DUI.newHorizontalContainer({
                             sizeFactor = 0.5,
@@ -72,7 +72,6 @@ function m.createWindow()
                             children = {DUI.newButton({
                                 sprite = githubImage,
                                 onClick=function ()
-                                    print("balls")
                                     love.system.openURL("https://github.com/doczi-dominik/capi" )
                                 end
                         })}
