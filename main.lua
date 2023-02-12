@@ -34,7 +34,14 @@ DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 --#endregion
 
 
+-- TODO: CLEAN UP OBJECT LIFECYCLES
+
+-- Initialized in main, random field set
+-- in createRoot, passed to both
+-- createContainer + createSheet to set remaining
+-- fields -- ???
 local sheetInfo = {}
+
 local panelInfo =  {}
 local spriteInfo = {}
 local flagInfo = {}
