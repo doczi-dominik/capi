@@ -1,20 +1,18 @@
+local createMapEditorSheet = require("ui.mapEditorSheet")
+
 local m = {}
 
-
----comment
+---@param projectData projectData
 ---@param panelInfo table
----@param sheetInfo table
 ---@param toolMediator toolMediator
 ---@return table
-function m.createRoot(panelInfo, sheetInfo, toolMediator)
+function m.createRoot(projectData, panelInfo, toolMediator)
     local icons = {
         gridButton = LG.newImage("assets/icons/grid.png"),
         moveButton = LG.newImage("assets/icons/move.png"),
         paintbrushButton = LG.newImage("assets/icons/paintbrush.png"),
         fillButton = LG.newImage("assets/icons/fill.png")
     }
-
-    sheetInfo.zoomText = {}
 
     ---@class buttonOptions
     local barButtonStyle = {
@@ -56,8 +54,10 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
         
     end
 
+    local mapEditorSheet = createMapEditorSheet(projectData, toolMediator)
+
     local toggleGrid = function()
-        SHEET.showGrid = not SHEET.showGrid
+        mapEditorSheet.showGrid = not mapEditorSheet.showGrid
     end
 
     return DUI.newMainContainer({ -- Main Window
@@ -88,7 +88,7 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                 }),
                 DUI.newVerticalContainer({ -- Editor winow
                     children = {
-                        DUI.newContainer({outVar = sheetInfo, sizeFactor = 0.948}),
+                        DUI.newContainer({outVar = mapEditorSheet, sizeFactor = 0.948}),
                         DUI.newHorizontalContainer({
                             bg_color = COLOR.PRIMARY,
                             padding = {0,1,0,1},
@@ -98,7 +98,7 @@ function m.createRoot(panelInfo, sheetInfo, toolMediator)
                                 DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2, onClick = function() toolMediator.selectedTool = "paintbrush" end}, tools),
                                 DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3, onClick = function() toolMediator.selectedTool = "fill" end}, tools),
                                 DUI.newButton({sizeFactor = 0.7}),
-                                DUI.newText({text = "Zoom: 100%", outVar = sheetInfo.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
+                                DUI.newText({text = "Zoom: 100%", outVar = mapEditorSheet.zoomText, color = COLOR.BUTTON_HIGHLIGHT})
                             }
                         })
                     }

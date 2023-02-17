@@ -33,33 +33,24 @@ DUI = require("libs.duckUI")
 DUI.setDefaultResolution(DESIGN_W,DESIGN_H)
 --#endregion
 
-
 -- TODO: CLEAN UP OBJECT LIFECYCLES
-
--- Initialized in main, random field set
--- in createRoot, passed to both
--- createContainer + createSheet to set remaining
--- fields -- ???
-local sheetInfo = {}
 
 local panelInfo =  {}
 local spriteInfo = {}
 local flagInfo = {}
 local toolMediator = require("data.tool_mediator")
 
+local projectData = require("data.project_data").create(16, 8, 8)
+projectData.sprites.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
+
 -- Set up multiple windows
 WINDOWS = {
-    EDITOR = require("ui.interface").createRoot(panelInfo, sheetInfo, toolMediator),
+    EDITOR = require("ui.interface").createRoot(projectData, panelInfo, toolMediator),
     PROJECT_WINDOW = require("ui.projectWindow").createWindow(),
 }
 
 -- Set the current window to the project select screen
-
 CURRENT_WINDOW = WINDOWS.PROJECT_WINDOW
-
-local projectData = require("data.project_data").create(16, 8, 8)
-
-projectData.sprites.addSpriteSheet("Test Sheet", love.image.newImageData("assets/image/test.png"))
 
 local spritePalette = require("ui.spritePalette")(projectData.sprites)
 
@@ -73,16 +64,6 @@ PAGES = {
 
 -- Default page when the program starts
 panelInfo.setChild(PAGES[1])
-
-SHEET = require("sheet.sheet")
-SHEET.init({
-    info = sheetInfo,
-    sprites = projectData.sprites,
-    cells = projectData.cells,
-    toolMediator = toolMediator
-})
-
-
 
 --#region- LOVE FUNCTIONS
 
