@@ -420,14 +420,16 @@ function lib.newContainer(options, style)
     end
 
     function c.mouseInput(x, y, button, type)
-        if type == "mousepressed" and c.outVar.mousepressed ~= nil then
-            c.outVar.mousepressed(x,y,button)
-        elseif type == "mousereleased"  and c.outVar.mousereleased ~= nil then
-            c.outVar.mousereleased(x,y,button)
-        elseif type == "mousemoved" and c.outVar.mousemoved ~= nil then
-            c.outVar.mousemoved(x,y)
-        elseif type == "wheelmoved" and c.outVar.wheelmoved ~= nil then
-            c.outVar.wheelmoved(x,y)
+        local ov = c.outVar
+
+        if type == "mousepressed" and ov.mousepressed ~= nil then
+            ov.mousepressed(x,y,button, ov)
+        elseif type == "mousereleased"  and ov.mousereleased ~= nil then
+            ov.mousereleased(x,y,button, ov)
+        elseif type == "mousemoved" and ov.mousemoved ~= nil then
+            ov.mousemoved(x,y, ov)
+        elseif type == "wheelmoved" and ov.wheelmoved ~= nil then
+            ov.wheelmoved(x,y, ov)
         end
     end
 
