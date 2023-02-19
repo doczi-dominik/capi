@@ -7,7 +7,7 @@ function m.fileDialogue()
         return
     end
 
-    local fileHandle = io.popen("open.bat")
+    local fileHandle = io.popen("open.bat load")
 
     if fileHandle == nil then
         return
