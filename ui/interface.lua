@@ -34,18 +34,11 @@ function m.createRoot(projectData, panelInfo, toolMediator)
     }
 
     ---@type buttonOptions
-    local bottomBarButtonStyle = {
-        bg_color = COLOR.BUTTON_COLOR,
-        highlight_color = COLOR.BUTTON_HIGHLIGHT,
-        sizeFactor = 0.04,
-        margin = 3,
-    }
-
     local tools = {
         bg_color = COLOR.BUTTON_COLOR,
         highlight_color = COLOR.BUTTON_HIGHLIGHT,
         sizeFactor = 0.04,
-        margin = 3,
+        margin = 2,
         dependencyTable = {}
     }
 
@@ -101,7 +94,7 @@ function m.createRoot(projectData, panelInfo, toolMediator)
                             bg_color = COLOR.PRIMARY,
                             padding = {0,1,0,1},
                             children = {  -- Bottom bar buttons
-                                DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, bottomBarButtonStyle),
+                                DUI.newButton({sprite = icons.gridButton, toggleable = true, onClick = toggleGrid, defaultOn = true}, tools),
                                 DUI.newButton({sprite = icons.moveButton, defaultOn = true, dependencyIndex = 1, onClick = function() toolMediator.selectedTool = "move" end}, tools),
                                 DUI.newButton({sprite = icons.paintbrushButton, dependencyIndex = 2, onClick = function() toolMediator.selectedTool = "paintbrush" end}, tools),
                                 DUI.newButton({sprite = icons.fillButton, dependencyIndex = 3, onClick = function() toolMediator.selectedTool = "fill" end}, tools),
