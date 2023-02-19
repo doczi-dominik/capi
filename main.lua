@@ -32,6 +32,8 @@ DUI.setDefaultResolution(DESIGN_W, DESIGN_H)
 
 -- TODO: CLEAN UP OBJECT LIFECYCLES
 
+local currentMouseDown
+
 local panelInfo =  {}
 local spriteInfo = {}
 local flagInfo = {}
@@ -78,19 +80,21 @@ function love.resize(w, h)
 end
 
 function love.mousepressed(x, y, button)
+	currentMouseDown = button
 	CURRENT_WINDOW.mouseInput(x, y, button, "mousepressed")
 end
 
 function love.mousereleased(x, y, button)
+	currentMouseDown = nil
 	CURRENT_WINDOW.mouseInput(x, y, button, "mousereleased")
 end
 
 function love.mousemoved(x, y)
-	CURRENT_WINDOW.mouseInput(x, y, nil, "mousemoved")
+	CURRENT_WINDOW.mouseInput(x, y, currentMouseDown, "mousemoved")
 end
 
 function love.wheelmoved(x, y)
-	CURRENT_WINDOW.mouseInput(x, y, nil, "wheelmoved")
+	CURRENT_WINDOW.mouseInput(x, y, currentMouseDown, "wheelmoved")
 end
 
 function love.update(dt) end
