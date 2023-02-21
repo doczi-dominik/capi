@@ -442,9 +442,9 @@ function lib.newContainer(options, style)
         elseif type == "mousereleased"  and ov.mousereleased ~= nil then
             ov.mousereleased(x,y,button, ov)
         elseif type == "mousemoved" and ov.mousemoved ~= nil then
-            ov.mousemoved(x,y, ov)
+            ov.mousemoved(x,y, ov, button)
         elseif type == "wheelmoved" and ov.wheelmoved ~= nil then
-            ov.wheelmoved(x,y, ov)
+            ov.wheelmoved(x,y, ov, button)
         end
     end
 

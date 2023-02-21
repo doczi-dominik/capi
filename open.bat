@@ -5,6 +5,8 @@
 @echo off
 setlocal
 
+set type=%1
+
 for /f "delims=" %%I in ('powershell "iex(${%~f0}|out-string)"') do (
     echo  %%~I
 )
@@ -13,7 +15,20 @@ goto :EOF
 : end Batch portion / begin PowerShell hybrid chimera #>
 
 Add-Type -AssemblyName System.Windows.Forms
-$f = new-object Windows.Forms.OpenFileDialog
-$f.InitialDirectory = pwd
-[void]$f.ShowDialog()
-$f.FileNamE
+function fileDialog([string]$type){
+    switch ($type) {
+        "load" {
+            $f = New-Object Windows.Forms.OpenFileDialog
+        }
+        "save" {
+            $f = New-Object Windows.Forms.SaveFileDialog
+        }
+        default {
+            throw "Invalid type specified: $type"
+        }
+    }
+    $f.InitialDirectory = pwd
+    [void]$f.ShowDialog()
+}
+
+fileDialog($env:type)
