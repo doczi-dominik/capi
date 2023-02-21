@@ -170,7 +170,7 @@ local function createMapEditorSheet(projectData, toolMediator)
 
         s.updateDrag(x, y)
         updateDraw(s, x, y)
-        updateErase(s, x, y) 
+        updateErase(s, x, y)
     end
 
     ---@param x integer
