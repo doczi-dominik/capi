@@ -16,14 +16,14 @@
 ---@field dragStartOffsetX integer
 ---@field dragStartOffsetY integer
 ---@field zoomText table
----@field getPosition fun(): integer, integer
+---@field screenToCell fun(screenX: integer, screenY: integer): integer, integer, boolean
+---@field cursorToCell fun(): integer, integer, boolean
 ---@field updateCursor fun(x: integer, y: integer)
 ---@field updateDrag fun(x: integer, y: integer)
 ---@field startDrag fun(x: integer, y: integer)
 ---@field finishDrag fun()
 
 ---@class createSheetOptions
----@field info table info table used by DuckUI to store layout info
 ---@field width integer width of the sheet in cells
 ---@field height integer height of the sheet in cells
 ---@field cellSize integer size of a cell in pixels
@@ -31,6 +31,7 @@
 ---@field mousepressed fun(x: integer, y: integer, button: integer, s: table?)
 ---@field mousereleased fun(x: integer, y: integer, button: integer, s: table?)
 ---@field draw fun(s: table)
+---@field drawUnscaled fun(s: table, x: integer, y: integer, scale: number)?
 
 local DESIGN_PADDING = 24
 
@@ -60,15 +61,29 @@ local function createSheet(opts)
     s.dragOffsetX = 0
     s.dragOffsetY = 0
 
-    s.zoomText = {}
+    function s.isCellValid(cellX, cellY)
+        local isXValid = 0 < cellX and cellX <= s.cellWidth
+        local isYValid = 0 < cellY and cellY <= s.cellHeight
 
-    function s.getPosition()
+        return isXValid and isYValid
+    end
+
+    function s.screenToCell(screenX, screenY)
         local padding = DESIGN_PADDING * SCALE
 
-        local x = s.x + padding + s.canvasX
-        local y = padding + s.canvasY
+        local baseX = s.x + padding + s.canvasX
+        local baseY = s.y + padding + s.canvasY
 
-        return x, y
+        local div = s.cellSize * s.canvasZoom * SCALE
+
+        local cellX = math.ceil((screenX - baseX) / div)
+        local cellY = math.ceil((screenY - baseY) / div)
+
+        return cellX, cellY, s.isCellValid(cellX, cellY)
+    end
+
+    function s.cursorToCell()
+        return s.screenToCell(s.cursorX, s.cursorY)
     end
 
     function s.updateCursor(x, y)
@@ -84,8 +99,16 @@ local function createSheet(opts)
             return
         end
 
-        s.canvasX = s.dragOffsetX + x - dsx
-        s.canvasY = s.dragOffsetY + y - dsy
+        local dx = x - dsx
+        local dy = y - dsy
+        local dist = math.sqrt(dx^2 + dy^2)
+
+        if dist < 15 then
+            return
+        end
+
+        s.canvasX = s.dragOffsetX + dx
+        s.canvasY = s.dragOffsetY + dy
     end
 
     function s.startDrag(x, y)
@@ -113,7 +136,9 @@ local function createSheet(opts)
             s.canvasZoom = s.canvasZoom - 0.1
         end
 
-        s.zoomText.setText(string.format("Zoom: %d%%", s.canvasZoom * 100))
+        if s.zoomText ~= nil then
+            s.zoomText.setText(string.format("Zoom: %d%%", s.canvasZoom * 100))
+        end
     end
 
     function s.draw()
@@ -158,6 +183,10 @@ local function createSheet(opts)
 
         LG.setLineWidth(1)
         LG.setColor(1, 1, 1, 1)
+
+        if opts.drawUnscaled ~= nil then
+            opts.drawUnscaled(s, x, y, scale)
+        end
 
         LG.setScissor()
     end

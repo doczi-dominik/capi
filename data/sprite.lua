@@ -45,12 +45,6 @@ function m.create(image, size, sx, sy, flags)
         LG.draw(image, quad, x, y)
     end
 
-    function s.drawForPalette(x, y)
-        local scale = 48 / size
-
-        LG.draw(image, quad, x, y, 0, scale, scale)
-    end
-
     return s
 end
 

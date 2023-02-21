@@ -28,20 +28,6 @@ local function createMapEditorSheet(projectData, toolMediator)
         return f
     end
 
-    ---@param s sheet
-    local function screenToCell(s, screenX, screenY)
-        local baseX, baseY = s.getPosition()
-        local div = sprites.spriteSize * s.canvasZoom * SCALE
-
-        local cellX = math.ceil((screenX - baseX) / div)
-        local cellY = math.ceil((screenY - baseY) / div)
-
-        local isXValid = 0 < cellX and cellX <= cellW
-        local isYValid = 0 < cellY and cellY <= cellH
-
-        return cellX, cellY, isXValid and isYValid
-    end
-
     local function floodFill(cellX, cellY, spriteToReplace)
         if cellX < 1 or cellX > cellW then return end
         if cellY < 1 or cellY > cellH then return end
@@ -52,7 +38,7 @@ local function createMapEditorSheet(projectData, toolMediator)
             return
         end
 
-        spr[math.max(1, #spr)] = sprites.selectedIndex
+        spr[math.max(1, #spr)] = sprites.selectedSprite
 
         floodFill(cellX - 1, cellY, spriteToReplace)
         floodFill(cellX + 1, cellY, spriteToReplace)
@@ -60,27 +46,33 @@ local function createMapEditorSheet(projectData, toolMediator)
         floodFill(cellX, cellY + 1, spriteToReplace)
     end
 
+    ---@param s sheet
+    ---@param x integer
+    ---@param y integer
     local function updateDraw(s, x, y)
         if not drawEnabled then
             return
         end
 
-        local cellX, cellY, isValid = screenToCell(s, x, y)
+        local cellX, cellY, isValid = s.screenToCell(x, y)
 
         if isValid and not drawFilter[cellY][cellX] then
             local cell = cells.data[cellY][cellX].sprites
 
-            cell[#cell+1] = sprites.selectedIndex
+            cell[#cell+1] = sprites.selectedSprite
             drawFilter[cellY][cellX] = true
         end
     end
 
+    ---@param s sheet
+    ---@param x integer
+    ---@param y integer
     local function updateErase(s, x, y)
         if not eraseEnabled then
             return
         end
 
-        local cellX, cellY, isValid = screenToCell(s, x, y)
+        local cellX, cellY, isValid = s.screenToCell(x, y)
 
         if isValid and not eraseFilter[cellY][cellX] then
             local cell = cells.data[cellY][cellX].sprites
@@ -99,15 +91,18 @@ local function createMapEditorSheet(projectData, toolMediator)
         updateDraw(s, x, y)
     end
 
+    ---@param s sheet
+    ---@param x integer
+    ---@param y integer
     local function onFillLeftClick(s, x, y)
-        local cellX, cellY, isValid = screenToCell(s, x, y)
+        local cellX, cellY, isValid = s.screenToCell(x, y)
 
         if not isValid then return end
 
         local spr = cells.data[cellY][cellX].sprites
         local spriteToReplace = spr[#spr]
 
-        if spriteToReplace == sprites.selectedIndex then
+        if spriteToReplace == sprites.selectedSprite then
             return
         end
 
@@ -214,9 +209,10 @@ local function createMapEditorSheet(projectData, toolMediator)
             end
         end
 
-        local selX, selY = screenToCell(s, s.cursorX, s.cursorY)
+        local selX, selY = s.cursorToCell()
+        local selSize = sprSize * sprites.selectionSize
 
-        LG.rectangle("fill", selX * sprSize - sprSize, selY * sprSize - sprSize, sprSize, sprSize)
+        LG.rectangle("fill", selX * sprSize - sprSize, selY * sprSize - sprSize, selSize, selSize)
     end
 
     return createSheet({

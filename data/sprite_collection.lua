@@ -10,9 +10,11 @@ m.SER_SHEET_DELIM = ";sc_s;"
 m.SER_DATA_DELIM = ";sc_d;"
 
 ---@class spriteCollection
+---@field sheets sheetMetadata[]
 ---@field data sprite[]
----@field selectedIndex integer
+---@field selectedSprite integer
 ---@field spriteSize integer
+---@field selectionSize integer
 ---@field addSpriteSheet fun(name: string, spritesheet: love.ImageData)
 ---@field removeSpriteSheet fun(name: string)
 ---@field serialize fun():string
@@ -26,7 +28,8 @@ function m.create(spriteSize)
     c.spriteSize = spriteSize
     c.sheets = {}   ---@type sheetMetadata[]
     c.data = {}  ---@type sprite[]
-    c.selectedIndex = 1
+    c.selectedSprite = 1
+    c.selectionSize = 1
 
     ---@param name string
     ---@param spritesheet love.ImageData

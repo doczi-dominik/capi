@@ -1,33 +1,95 @@
+local createSheet = require("ui.sheet")
 
----@param spriteCollection spriteCollection
+---@param sprites spriteCollection
 ---@return table
-local function create(spriteCollection)
-    local p = {}
+local function create(sprites)
+    local data = sprites.data
+    local sprSize = sprites.spriteSize
 
-    function p.mousepressed()
+    local w, h = sprites.sheets[1].spritesheet:getDimensions()
+
+    w = math.ceil(w / sprSize)
+    h = math.ceil(h / sprSize)
+
+    local function cellToIndex(x, y)
+        return 1 + math.floor(y / sprSize) * (w + 1) + math.floor(x / sprSize)
     end
 
-    function p.mousemoved()
+    local function indexToCell(i)
+        i = i - 1
+        local ww = w + 1
+
+        local x = i % ww * sprSize
+        local y = math.floor(i / ww) * sprSize
+
+        return x, y
     end
 
-    function p.draw(t)
-        LG.setColor(COLOR.BLACK)
-        LG.rectangle("fill",t.x ,t.y,t.w,t.h)
+    ---@param x integer
+    ---@param y integer
+    ---@param s sheet
+    local function mousemoved(x, y, s)
+        s.updateCursor(x, y)
 
-        LG.setColor(COLOR.WHITE)
+        s.updateDrag(x, y)
+    end
 
-        local colCount = math.floor(t.w / 48)
-        local rowCount = math.floor(t.h / 48)
+    ---@param x integer
+    ---@param y integer
+    ---@param button integer
+    ---@param s sheet
+    local function mousepressed(x, y, button, s)
+        s.startDrag(x, y)
 
-        for i = 1, math.min(#spriteCollection.data, colCount * rowCount) do
-            local s = spriteCollection.data[i]
-            local ii = i -1
+        local cellX, cellY, isValid = s.screenToCell(x, y)
 
-            s.drawForPalette(t.x + ii % colCount * 48, t.y + math.floor(ii / colCount) * 48)
+        if not isValid then
+            return
         end
+
+        sprites.selectedSprite = cellToIndex(cellX, cellY)
     end
 
-    return p
+    ---@param x integer
+    ---@param y integer
+    ---@param button integer
+    ---@param s sheet
+    local function mousereleased(x, y, button, s)
+        s.finishDrag()
+    end
+
+    ---@param s sheet
+    local function draw(s)
+        for i = 1, #data do
+            data[i].draw(indexToCell(i))
+        end
+
+        local selX, selY = s.cursorToCell()
+        local selSize = sprSize * sprites.selectionSize
+
+        LG.rectangle("fill", selX * sprSize - sprSize, selY * sprSize - sprSize, selSize, selSize)
+    end
+
+    ---@param s sheet|table
+    local function drawUnscaled(s, x, y, scale)
+        local selSize = sprSize * sprites.selectionSize
+        local selX, selY = indexToCell(sprites.selectedSprite)
+
+        LG.setLineWidth(3)
+        LG.rectangle("line", x + selX * scale, y + selY * scale, selSize * scale, selSize * scale)
+        LG.setLineWidth(1)
+    end
+
+    return createSheet({
+        width = w,
+        height = h,
+        cellSize = sprSize,
+        mousemoved = mousemoved,
+        mousepressed = mousepressed,
+        mousereleased = mousereleased,
+        draw = draw,
+        drawUnscaled = drawUnscaled
+    })
 end
 
 return create
