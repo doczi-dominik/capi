@@ -1,6 +1,7 @@
-Paintbrush with selectionSize | id:08ee6eb3068580b37a5bea6dae27b819effe9731, creation:2023/02/21/19/39, finished:1970/01/01/01/00
 Fill with selectionSize | id:67a09f77c3525881c7c2076913cd02982adfadba, creation:2023/02/21/19/39, finished:1970/01/01/01/00
 Restore Sprites tab UI | id:7395451c6d5511df744a36a03de6d64d437bac8d, creation:2023/02/21/19/40, finished:1970/01/01/01/00
 Revert mousemoved button parameter | id:f73c2b3689105d2bf1a347680a2ff23ea17341f7, creation:2023/02/21/19/40, finished:1970/01/01/01/00
 Store component of last mouse event, call mouseleft when changed | id:f1c9cf2ac1b9739a43f92e87df5eeff2a2a90d89, creation:2023/02/21/19/41, finished:1970/01/01/01/00
 Clean up object lifecycles | id:8c5c0f8652f638a23710eb5909dbd22ff6f3c37f, creation:2023/02/21/19/41, finished:1970/01/01/01/00
+Implement multiple spritesheets FIRST | id:03e21515446a8d74ab445ab782366ccde1424ed2, creation:2023/02/21/20/37, finished:1970/01/01/01/00
+cellToIndex/indexToCell should be on sprite_collection | id:f19576f88f73acc76224cf57f72b8e6020fa977b, creation:2023/02/21/20/38, finished:1970/01/01/01/00
