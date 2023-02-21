@@ -12,7 +12,7 @@ local function create(sprites)
     h = math.ceil(h / sprSize)
 
     local function cellToIndex(x, y)
-        return 1 + math.floor(y / sprSize) * (w + 1) + math.floor(x / sprSize)
+        return (y - 1) * (w + 1) + x
     end
 
     local function indexToCell(i)
