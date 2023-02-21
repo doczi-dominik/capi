@@ -11,20 +11,6 @@ local function create(sprites)
     w = math.ceil(w / sprSize)
     h = math.ceil(h / sprSize)
 
-    local function cellToIndex(x, y)
-        return (y - 1) * (w + 1) + x
-    end
-
-    local function indexToCell(i)
-        i = i - 1
-        local ww = w + 1
-
-        local x = i % ww * sprSize
-        local y = math.floor(i / ww) * sprSize
-
-        return x, y
-    end
-
     ---@param x integer
     ---@param y integer
     ---@param s sheet
@@ -47,7 +33,7 @@ local function create(sprites)
             return
         end
 
-        sprites.selectedSprite = cellToIndex(cellX, cellY)
+        sprites.selectedSprite = s.cellToIndex(cellX, cellY)
     end
 
     ---@param x integer
@@ -61,7 +47,7 @@ local function create(sprites)
     ---@param s sheet
     local function draw(s)
         for i = 1, #data do
-            data[i].draw(indexToCell(i))
+            data[i].draw(s.indexToCell(i))
         end
 
         local selX, selY = s.cursorToCell()
@@ -73,7 +59,7 @@ local function create(sprites)
     ---@param s sheet|table
     local function drawUnscaled(s, x, y, scale)
         local selSize = sprSize * sprites.selectionSize
-        local selX, selY = indexToCell(sprites.selectedSprite)
+        local selX, selY = s.indexToCell(sprites.selectedSprite)
 
         LG.setLineWidth(3)
         LG.rectangle("line", x + selX * scale, y + selY * scale, selSize * scale, selSize * scale)

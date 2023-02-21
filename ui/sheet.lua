@@ -16,8 +16,11 @@
 ---@field dragStartOffsetX integer
 ---@field dragStartOffsetY integer
 ---@field zoomText table
+---@field isCellValid fun(cellX: integer, cellY: integer): boolean
 ---@field screenToCell fun(screenX: integer, screenY: integer): integer, integer, boolean
 ---@field cursorToCell fun(): integer, integer, boolean
+---@field cellToIndex fun(x: integer, y: integer): integer
+---@field indexToCell fun(i: integer): integer, integer
 ---@field updateCursor fun(x: integer, y: integer)
 ---@field updateDrag fun(x: integer, y: integer)
 ---@field startDrag fun(x: integer, y: integer)
@@ -84,6 +87,20 @@ local function createSheet(opts)
 
     function s.cursorToCell()
         return s.screenToCell(s.cursorX, s.cursorY)
+    end
+
+    function s.cellToIndex(x, y)
+        return (y - 1) * (s.cellWidth + 1) + x
+    end
+
+    function s.indexToCell(i)
+        i = i - 1
+        local ww = s.cellWidth + 1
+
+        local x = i % ww * s.cellSize
+        local y = math.floor(i / ww) * s.cellSize
+
+        return x, y
     end
 
     function s.updateCursor(x, y)

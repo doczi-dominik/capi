@@ -29,7 +29,7 @@ function m.create(spriteSize)
     c.sheets = {}   ---@type sheetMetadata[]
     c.data = {}  ---@type sprite[]
     c.selectedSprite = 1
-    c.selectionSize = 1
+    c.selectionSize = 3
 
     ---@param name string
     ---@param spritesheet love.ImageData

@@ -54,13 +54,24 @@ local function createMapEditorSheet(projectData, toolMediator)
             return
         end
 
-        local cellX, cellY, isValid = s.screenToCell(x, y)
+        local cellX, cellY, _ = s.screenToCell(x, y)
+        local offsetCount = sprites.selectionSize - 1
 
-        if isValid and not drawFilter[cellY][cellX] then
-            local cell = cells.data[cellY][cellX].sprites
+        local spriteX, spriteY = s.indexToCell(sprites.selectedSprite)
 
-            cell[#cell+1] = sprites.selectedSprite
-            drawFilter[cellY][cellX] = true
+        for offsetY = 0, offsetCount do
+            for offsetX = 0, offsetCount do
+                local cx, cy = cellX + offsetX, cellY + offsetY
+
+                if s.isCellValid(cx, cy) and not drawFilter[cy][cx] then
+                    local cell = cells.data[cy][cx].sprites
+
+                    cell[#cell+1] = s.cellToIndex(spriteX + offsetX, spriteY + offsetY)
+
+                    print(cx, cy, cell[#cell])
+                    drawFilter[cy][cx] = true
+                end
+            end
         end
     end
 
